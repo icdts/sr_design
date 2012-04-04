@@ -1,6 +1,5 @@
 Files that need to be commented:
 
-"bilinear_interp.m"
 "gen_shift_downsample_image.m"
 "pocs.m"
 "reg_gui.m"
