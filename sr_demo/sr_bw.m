@@ -2,6 +2,7 @@
 %Called from sr_gui by SRColorButton_Callback (image,h,(color-1)/3, 1/3)
 function image=sr_bw(t2,handle_wb,offset_wb,scale_wb,ds,max_shift,th_prob1,th_prob2,no_iter)
 
+%EDIT
 %Theoretically these are never passed into this function 
 if ~exist('ds','var')
     ds=4; % four time super resolution ??? what
