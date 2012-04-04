@@ -5,8 +5,6 @@ Files that need to be commented:
 "pocs.m"
 "reg_gui.m"
 "register_color_image.m"
-"shift_image.m"
-"shift_image_rot.m"
 "sr_gui.m"
 "sr_one_step.m"
 "sr_one_step_wb.m"
