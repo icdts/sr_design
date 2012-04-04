@@ -11,7 +11,8 @@ sid=1;
 sranges={};
 sigma2=sigma*sigma;
 %for -8 to 8 in x direction then -8 to 8 iny direction
-%sranges{n} = x, y  ??? why curly braces?
+%sranges{n} = x, y  ??? why curly braces?  => curly braces are array accessors.  so if a is an array, a{1} gets first ele of array. a{1,2} gets 
+    % first column second row?  or first row second column.  Can never remember
 %score(n) = ??? something
 for id=sr(1):sr(2) % search range
     for jd=sr(3):sr(4)
