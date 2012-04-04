@@ -1,6 +1,5 @@
 Files that need to be commented:
 
-"pocs.m"
 "reg_gui.m"
 "sr_gui.m"
 "sr_one_step.m"
