@@ -1,6 +1,9 @@
 git add .
 git commit -m "comment"
-git push master ***
+git checkout master
+git pull
+git merge grant
+git push
 
 (git checkout master)
 git pull
