@@ -1,0 +1,20 @@
+Files that need to be commented:
+
+"gen_shift_downsample_image.m"
+"pocs.m"
+"reg_gui.m"
+"register_color_image.m"
+"sr_gui.m"
+"sr_one_step.m"
+"sr_one_step_wb.m"
+~"subpixel_register.m" --not quite done
+
+
+Exceptions:
+
+"popupmessage.m"
+  -Just generates error dialogs.  Not necessarily useful for us.
+"get_images_from_files.m"
+  -Just opens images.
+
+

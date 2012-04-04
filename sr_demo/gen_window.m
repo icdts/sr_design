@@ -1,5 +1,8 @@
 function w=gen_window(s,d1,d2);
 %size s is an array s(1) = x, s(2) = y
+%s(1) = pixels in y direction, s(2) is pixels in x direction
+%called in reg_gui.m with d1 and d2 not specified
+%called in register_image with 0.05 for d1 and d2
 
 if ~exist('d1','var')
     d1=0.1;
