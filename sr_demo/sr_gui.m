@@ -119,20 +119,10 @@ handles.images=[];
 h=waitbar(0,'Loading images...');
 for id=1:length(files)
     handles.images{id}=double(imread(sprintf('%s/%s',folder,files(id).name)))/255;
-%     for color=1:3
-%         timage(:,:,color)=double(flipud(handles.images{id}(:,:,color)'));
-%     end
     waitbar(id/length(files),h);
-%     handles.images{id}=timage;
 end
 delete(h);
  
-% for color=1:3
-%     timage(:,:,color)=double(flipud(handles.images{1}(:,:,color)'));
-% end
-% images{1}=timage;
-
-% handle.ImageAxes
 axes(handles.ImageAxes);
 hold off;
 imshow(handles.images{1});
@@ -144,9 +134,6 @@ set(handles.frame_title,'string','Frame 1');
 title('Frame 1');
 guidata(hObject,handles);
 
-% if ~isequal(folder, 0)
-%     open(file);
-% end
 
 % --------------------------------------------------------------------
 function PrintMenuItem_Callback(hObject, eventdata, handles)
@@ -384,10 +371,7 @@ function RegisterImageButton_Callback(hObject, eventdata, handles)
 h=waitbar(0,'Registering images...');
 for id=2:length(handles.images)
     clear timage;
-%     for color=1:3
-%         timage(:,:,color)=register_image(double(handles.images{1}(:,:,color)),double(handles.images{id}(:,:,color)));
-%         
-%     end
+
     timage=register_color_image(double(handles.images{1}), double(handles.images{id}));
     handles.images{id}=timage;
     waitbar(id/length(handles.images),h);
@@ -475,13 +459,10 @@ for id=1:length(handles.images)
 end
 delete(h);
 
-% handle.ImageAxes
 axes(handles.ImageAxes);
 hold off;
 imshow(handles.images{1});
 hold on;
-% set(handles.FrameSlider,'min',1);
-% set(handles.FrameSlider,'max',length(handles.images));
 set(handles.FrameSlider,'value',1);
 set(handles.frame_title,'string','Frame 1');
 title('Frame 1');
@@ -505,13 +486,10 @@ for id=1:length(handles.images)
 end
 delete(h);
 
-% handle.ImageAxes
 axes(handles.ImageAxes);
 hold off;
 imshow(handles.images{1});
 hold on;
-% set(handles.FrameSlider,'min',1);
-% set(handles.FrameSlider,'max',length(handles.images));
 set(handles.FrameSlider,'value',1);
 set(handles.frame_title,'string','Frame 1');
 title('Frame 1');
