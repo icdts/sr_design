@@ -1,3 +1,5 @@
+%This just gets images from a file, nothing else and will be totally
+%different when we have to implement it:
 function files=get_images_from_files(prefix, suffix, frange);
 
 id=1;
