@@ -1,6 +1,5 @@
 Files that need to be commented:
 
-"gen_shift_downsample_image.m"
 "pocs.m"
 "reg_gui.m"
 "sr_gui.m"
