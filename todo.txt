@@ -1,11 +1,8 @@
 Files that need to be commented:
 
-"reg_gui.m"
-"register_color_image.m"
 "sr_gui.m"
 "sr_one_step.m"
 "sr_one_step_wb.m"
-
 
 Exceptions:
 
