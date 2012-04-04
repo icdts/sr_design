@@ -35,6 +35,7 @@ tic
 [image,probs,shs,scores]=sr_one_step_wb(image,t2,'average',ds,search_range,sigma,th_prob1,handle_wb,offset_wb,scale_wb/2);
 toc
 
+%sort_pocs as the method should always give an error message... weird.
 fprintf('start super-resolution 2nd phase...\n');
 for iter=1:no_iter
     tic

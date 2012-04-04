@@ -13,11 +13,14 @@ if ~exist('th_prob','var')
     th_prob=0.9;
 end
 
+%creates an array of zeros with 2 columns and number of rows equal to the
+%number of input images
 shs=zeros(length(t),2);
 
 orig_image=image;
 %image=kron(t{1},ones(ds));
-if exist('orig_sh','var') % cheat mode
+%apparently orig_sh never exists, so only the else block will be executed
+if exist('orig_sh','var') % OLD COMMENT cheat mode
    scores=[];
    for tid=1:length(t)
      shs(tid,:)=orig_sh(tid,:);
@@ -25,19 +28,29 @@ if exist('orig_sh','var') % cheat mode
    end
 else
   for tid=1:length(t)
+      %drawing waitbar
       waitbar(tid/2/length(t)*scale+offset,wb_handle);
         [tmp_sh,tmp_prob,tmp_scores]=subpixel_register(image,t{tid},ds,sr,sigma);
         probs(tid)=tmp_prob;
 %        tmp_sh=orig_sh{tid}-orig_sh{1}; % cheating
 %        tmp_prob=1; % cheating
+        %replaces the row in shs corresponding to the input image id with
+        %its shift value from subpixel_register
         shs(tid,:)=tmp_sh;
+        %replaces the index in scores corresponding to the input image id with
+        %its scores from subpixel_register
         scores{tid}=tmp_scores;
   end
 end
 
+%based off the function alls, the only methods used are average and
+%sort_pocs. There's no elseif for sort_pocs, so it should always give an
+%error message
+%if method is 'max_pocs'... seemingly never used
 if strcmp(method,'max_pocs') % only project to the one with highest score
     [dummy,max_id]=max(probs);
     image=pocs(image,t{max_id},ds,shs(max_id,:));
+%if method is 'pocs'... seemingly never called
 elseif strcmp(method,'pocs')
   for tid=1:length(t)
       waitbar((length(t)+tid)/2/length(t)*scale+offset,wb_handle);
@@ -50,11 +63,14 @@ elseif strcmp(method,'pocs')
 
      end
   end
+  %if method is 'average'
 elseif strcmp(method,'average')
   image=zeros(size(image));
   for tid=1:length(t)
+      %draws waitbar
       waitbar((length(t)+tid)/2/length(t)*scale+offset,wb_handle);      
-     if (probs(tid) > th_prob)
+     %TO DO
+      if (probs(tid) > th_prob)
             sh_image=shift_image(kron(t{tid},ones(ds)),-shs(tid,:));
             image=image+sh_image;
 %         imshow(sh_image/255);
