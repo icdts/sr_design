@@ -1,11 +1,8 @@
-#ifdef _MSC_VER
-	//FIXME: Windows includes
-#else
-	#include <opencv/cv.h>
-	#include <opencv2/core/core.hpp>
-	#include <opencv2/highgui/highgui.hpp>
-#endif
+#include <opencv/cv.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include <iostream>
+#include <stdio.h>
 
 using namespace std;
 using namespace cv;
@@ -15,29 +12,28 @@ IplImage* cropImage(const IplImage *img, const CvRect region);
 IplImage* resizeImage(const IplImage *origImg, int newWidth, int newHeight, bool keepAspectRatio);
 
 int main(int argc, char* argv[]){
-	cout<<"Something is working";
-	if( argc != 2) {
-	    cout <<" Usage: display_image ImageToLoadAndDisplay" << endl;
-	    return -1;
-	}
+/*if( argc != 2) {
+     cout <<" Usage: display_image ImageToLoadAndDisplay" << endl;
+     return -1;
+    }
+	*/
 	
-	
-	int rescale_factor = 2;
+int rescale_factor = 2;
 
     IplImage *image;
 
 
-    image = cvLoadImage(argv[1], CV_LOAD_IMAGE_COLOR); // Read the file
-	Mat w = Mat(image->width, image->height, CV_32F);
+    image = cvLoadImage("cars.JPG", CV_LOAD_IMAGE_COLOR); // Read the file
+	Mat w = Mat::Mat(23, 23, CV_32F);
     namedWindow( "Display window", CV_WINDOW_AUTOSIZE );// Create a window for display.
-    cout<<"about to enter gen_window";
-	w = *gen_window(image->height, image->width, 0.1, 0.1);
+
+w = *gen_window(image->height, image->width, 0.1, 0.1);
 
     /*cvShowImage( "Display window", w ); // Show our image inside it.
     waitKey(0); // Wait for a keystroke in the window
 
-	cvReleaseImage(&image);
-	cvReleaseImage(&w);*/
+cvReleaseImage(&image);
+cvReleaseImage(&w);*/
     return 0;
 }
 
@@ -46,7 +42,6 @@ is 1 with s1*d1 numbers fading from 1 to 0 at each x edge and s2*d2 at
 each y edge */
 Mat* gen_window(int s1, int s2, float d1, float d2)
 {
-	cout<<"top of gen_window";
 	Mat *w;
 	//Create an s1 by 1 matrix (column matrix) filled with ones
 	Mat x = Mat::ones(s1, 1, CV_32F);
@@ -78,7 +73,7 @@ Mat* gen_window(int s1, int s2, float d1, float d2)
 		slope = slope + increment;
 	}
 
-	Mat z = Mat(s1, s2, CV_32F);
+	Mat z = Mat::Mat(s1, s2, CV_32F);
 	z = x * y;
 	w = &z;
 	return w;
