@@ -1,0 +1,14 @@
+Files that need to be commented:
+
+"sr_gui.m"
+"sr_one_step.m"
+"sr_one_step_wb.m"
+
+Exceptions:
+
+"popupmessage.m"
+  -Just generates error dialogs.  Not necessarily useful for us.
+"get_images_from_files.m"
+  -Just opens images.
+
+
