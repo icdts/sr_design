@@ -179,7 +179,7 @@ IplImage *shiftImage(const IplImage *src, int vertical, int horizontal){
 	if(oppositeDirection){
 		vertical *= -1;
 	}
-	for(int i = 0; i < vertical && i < src->height; i++){
+	for(int i = 1; i <= vertical && i < src->height; i++){
 		if(oppositeDirection){
 			origRegion = cvRect( 0, i, src->width, src->height);
 			shiftedRegion = cvRect( 0, 0, origRegion.width, origRegion.height - i);
@@ -202,7 +202,7 @@ IplImage *shiftImage(const IplImage *src, int vertical, int horizontal){
 	if(oppositeDirection){
 		horizontal *= -1;
 	}
-	for(int i = 0; i < horizontal && i < src->width; i++){
+	for(int i = 1; i <= horizontal && i < src->width; i++){
 		if(oppositeDirection){
 			origRegion = cvRect( i, 0, origRegion.width, origRegion.height);
 			shiftedRegion = cvRect( 0, 0, src->width - i, src->height );
