@@ -10,9 +10,10 @@
 using namespace std;
 using namespace cv;
 
-IplImage* cropImage(const IplImage *img, const CvRect region);
-IplImage* resizeImage(const IplImage *origImg, int newWidth, int newHeight, bool keepAspectRatio);
+IplImage *cropImage(const IplImage *img, const CvRect region);
+IplImage *resizeImage(const IplImage *origImg, int newWidth, int newHeight, bool keepAspectRatio);
 IplImage *rotateImage(const IplImage *src, float angleDegrees);
+IplImage *shiftImage(const IplImage *src, int up_down, int left_right);
 
 int main(int argc, char* argv[]){
 	if( argc != 2) {
@@ -180,4 +181,22 @@ IplImage *rotateImage(const IplImage *src, float angleDegrees){
 	cvGetQuadrangleSubPix( src, imageRotated, &M);
 
 	return imageRotated;
+}
+
+
+IplImage *shiftImage(const IplImage *src, int up, int right){
+	IplImage *imageShifted;
+	CvSize size;
+	
+	// Set the desired region of interest (entire image here)
+	CvRect orig_region = cvRect(0,0, src->width, src->height);
+	cvSetImageROI(src, orig_region);
+
+	// Create a new image to copy to
+	imageShifted = cvCreateImage(img->size, img->depth, img->nChannels);
+
+	// Copy region into new image
+	cvCopy(img, imageShifted);
+
+	return imageShifted;
 }
