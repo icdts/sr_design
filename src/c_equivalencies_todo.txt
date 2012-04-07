@@ -1,11 +1,10 @@
-gen_shift_downsample_image.m
+--in progress-Mitch-- gen_shift_downsample_image.m
 get_images_from_files.m
 pocs.m
 *popupmessage.m
 reg_gui.m
 register_color_image.m
 register_image.m
-shift_image_rot.m
 sr_bw.m
 sr_gui.m
 sr_one_step.m
