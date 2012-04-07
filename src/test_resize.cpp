@@ -6,60 +6,72 @@
 using namespace std;
 using namespace cv;
 
-
 IplImage* cropImage(const IplImage *img, const CvRect region);
 IplImage* resizeImage(const IplImage *origImg, int newWidth, int newHeight, bool keepAspectRatio);
+IplImage *rotateImage(const IplImage *src, float angleDegrees);
 
 int main(int argc, char* argv[]){
 	if( argc != 2) {
-     cout <<" Usage: display_image ImageToLoadAndDisplay" << endl;
-     return -1;
+		cout <<" Usage: display_image ImageToLoadAndDisplay" << endl;
+		return -1;
     }
 
 	int rescale_factor = 2;
 
     IplImage *image;
 	IplImage *bigger_image;
+	IplImage *rotated_image;
 
-    image = cvLoadImage(argv[1], CV_LOAD_IMAGE_COLOR);   // Read the file
+	//Read in Image
+    image = cvLoadImage(argv[1], CV_LOAD_IMAGE_COLOR);
 
-    namedWindow( "Display window", CV_WINDOW_AUTOSIZE );// Create a window for display.
-
+	//Transform image
 	bigger_image = resizeImage(image,image->width*rescale_factor,image->height*rescale_factor,false);
+	rotated_image = rotateImage(image,180);
 
-    cvShowImage( "Display window", bigger_image );                   // Show our image inside it.
-    waitKey(0);                                          // Wait for a keystroke in the window
+	//Show all the images
+    namedWindow( "original", CV_WINDOW_AUTOSIZE );
+    namedWindow( "bigger", CV_WINDOW_AUTOSIZE );
+    namedWindow( "rotated", CV_WINDOW_AUTOSIZE );
+    cvShowImage( "original", image );
+    cvShowImage( "bigger", bigger_image );
+    cvShowImage( "rotated", rotated_image );
+    waitKey(0);
 
+	//Release memory
 	cvReleaseImage(&image);
 	cvReleaseImage(&bigger_image);
+	cvReleaseImage(&rotated_image);
     return 0;	
 }
 
 // Returns a new image that is a cropped version (rectangular cut-out)
 // of the original image.
-IplImage* cropImage(const IplImage *img, const CvRect region)
-{
+IplImage* cropImage(const IplImage *img, const CvRect region){
 	IplImage *imageCropped;
 	CvSize size;
 
-	if (img->width <= 0 || img->height <= 0
-		|| region.width <= 0 || region.height <= 0) {
-		//cerr << "ERROR in cropImage(): invalid dimensions." << endl;
+	if (img->width <= 0 || img->height <= 0 || region.width <= 0 || region.height <= 0) {
+		cerr << "ERROR in cropImage(): invalid dimensions." << endl;
 		exit(1);
 	}
 
+	//FIXME: Make work with more depths
 	if (img->depth != IPL_DEPTH_8U) {
-		//cerr << "ERROR in cropImage(): image depth is not 8." << endl;
+		cerr << "ERROR in cropImage(): image depth is not 8." << endl;
 		exit(1);
 	}
 
 	// Set the desired region of interest.
 	cvSetImageROI((IplImage*)img, region);
-	// Copy region of interest into a new iplImage and return it.
+
+	// Create image the same size of region
 	size.width = region.width;
 	size.height = region.height;
 	imageCropped = cvCreateImage(size, IPL_DEPTH_8U, img->nChannels);
-	cvCopy(img, imageCropped);	// Copy just the region.
+
+	// Copy region into new image
+	cvCopy(img, imageCropped);
 
 	return imageCropped;
 }
@@ -70,9 +82,7 @@ IplImage* cropImage(const IplImage *img, const CvRect region)
 // so that only pixels of the original image are shown, instead of adding
 // extra blank space.
 // Remember to free the new image later.
-IplImage* resizeImage(const IplImage *origImg, int newWidth,
-	int newHeight, bool keepAspectRatio)
-{
+IplImage* resizeImage(const IplImage *origImg, int newWidth, int newHeight, bool keepAspectRatio){
 	IplImage *outImg = 0;
 	int origWidth;
 	int origHeight;
@@ -80,10 +90,10 @@ IplImage* resizeImage(const IplImage *origImg, int newWidth,
 		origWidth = origImg->width;
 		origHeight = origImg->height;
 	}
-	if (newWidth <= 0 || newHeight <= 0 || origImg == 0
-		|| origWidth <= 0 || origHeight <= 0) {
-		//cerr << "ERROR: Bad desired image size of " << newWidth
-		//	<< "x" << newHeight << " in resizeImage().\n";
+
+	if (newWidth <= 0 || newHeight <= 0 || origImg == 0 || origWidth <= 0 || origHeight <= 0) {
+		cerr << "ERROR: Bad desired image size of " << newWidth
+			<< "x" << newHeight << " in resizeImage().\n";
 		exit(1);
 	}
 
@@ -134,4 +144,36 @@ IplImage* resizeImage(const IplImage *origImg, int newWidth,
 
 	}
 	return outImg;
+}
+
+// Rotate the image clockwise (or counter-clockwise if negative).
+// Remember to free the returned image.
+IplImage *rotateImage(const IplImage *src, float angleDegrees){
+	// Create a map_matrix, where the left 2x2 matrix
+	// is the transform and the right 2x1 is the dimensions.
+	float m[6];
+	CvMat M = cvMat(2, 3, CV_32F, m);
+	int w = src->width;
+	int h = src->height;
+	float angleRadians = angleDegrees * ((float)CV_PI / 180.0f);
+	m[0] = (float)( cos(angleRadians) );
+	m[1] = (float)( sin(angleRadians) );
+	m[3] = -m[1];
+	m[4] = m[0];
+	m[2] = w*0.5f;  
+	m[5] = h*0.5f;  
+
+	// Make a spare image for the result
+	CvSize sizeRotated;
+	sizeRotated.width = cvRound(w);
+	sizeRotated.height = cvRound(h);
+
+	// Rotate
+	IplImage *imageRotated = cvCreateImage( sizeRotated,
+		src->depth, src->nChannels );
+
+	// Transform the image
+	cvGetQuadrangleSubPix( src, imageRotated, &M);
+
+	return imageRotated;
 }
