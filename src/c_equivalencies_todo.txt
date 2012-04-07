@@ -1,4 +1,3 @@
---in progress-Mitch-- gen_shift_downsample_image.m
 get_images_from_files.m
 pocs.m
 *popupmessage.m

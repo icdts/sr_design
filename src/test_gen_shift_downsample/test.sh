@@ -1,0 +1,1 @@
+./gen_shift_downsample_test /usr/share/pixmaps/faces/coffee.jpg
