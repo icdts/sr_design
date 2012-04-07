@@ -184,19 +184,43 @@ IplImage *rotateImage(const IplImage *src, float angleDegrees){
 }
 
 
-IplImage *shiftImage(const IplImage *src, int up, int right){
+IplImage *shiftImage(const IplImage *src, int vertical, int horizontal){
+	int modifier;
 	IplImage *imageShifted;
 	CvSize size;
 	
 	// Set the desired region of interest (entire image here)
-	CvRect orig_region = cvRect(0,0, src->width, src->height);
-	cvSetImageROI(src, orig_region);
+	CvRect origRegion = cvRect(0,0, src->width, src->height);
+	cvSetImageROI(src, origRegion);
 
 	// Create a new image to copy to
 	imageShifted = cvCreateImage(img->size, img->depth, img->nChannels);
 
-	// Copy region into new image
-	cvCopy(img, imageShifted);
+	//Convert to positive values
+	if(vertical >= 0){
+		modifier = 1;
+	}else{
+		modifier = -1;
+		vertical *= -1;
+	}
+	for(int i = 0; i < vertical; i++){
+		cvResetImageROI(imageShifted);
+		CvRect shiftedRegion = cvRect(0,i*modifier,origRegion->width,origRegion->height);
+		cvSetImageROI(imageShifted,shiftedRegion);
+		cvCopy(img, imageShifted);
+	}
+	if(horizontal >= 0){
+		modifier = 1;
+	}else{
+		modifier = -1;
+		horizontal *= -1;
+	}
+	for(int i = 0; i < horizontal; i++){
+		cvResetImageROI(imageShifted);
+		CvRect shiftedRegion = cvRect(i*modifier,0,origRegion->width,origRegion->height);
+		cvSetImageROI(imageShifted,shiftedRegion);
+		cvCopy(img, imageShifted);
+	}
 
 	return imageShifted;
 }
