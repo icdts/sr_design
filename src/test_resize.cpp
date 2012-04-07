@@ -14,6 +14,7 @@ IplImage *cropImage(const IplImage *img, const CvRect region);
 IplImage *resizeImage(const IplImage *origImg, int newWidth, int newHeight, bool keepAspectRatio);
 IplImage *rotateImage(const IplImage *src, float angleDegrees);
 IplImage *shiftImage(const IplImage *src, int up_down, int left_right);
+IplImage *shiftImageRot(const IplImage *src, int up_down, int left_right);
 
 int main(int argc, char* argv[]){
 	if( argc != 2) {
@@ -34,7 +35,7 @@ int main(int argc, char* argv[]){
 	//Transform image
 	bigger_image = resizeImage(image,image->width*rescale_factor,image->height*rescale_factor,false);
 	rotated_image = rotateImage(image,180);
-	shifted_image = shiftImage(image,-50,-50);
+	shifted_image = shiftImageRot(image,-50,0);
 
 	//Show all the images
     namedWindow( "original", CV_WINDOW_AUTOSIZE );
@@ -209,7 +210,7 @@ IplImage *shiftImage(const IplImage *src, int vertical, int horizontal){
 	if(oppositeDirection){
 		vertical *= -1;
 	}
-	for(int i = 0; i < vertical && i < src->height; i++){
+	for(int i = 1; i <= vertical && i < src->height; i++){
 		if(oppositeDirection){
 			origRegion = cvRect( 0, i, src->width, src->height);
 			shiftedRegion = cvRect( 0, 0, origRegion.width, origRegion.height - i);
@@ -232,7 +233,7 @@ IplImage *shiftImage(const IplImage *src, int vertical, int horizontal){
 	if(oppositeDirection){
 		horizontal *= -1;
 	}
-	for(int i = 0; i < horizontal && i < src->width; i++){
+	for(int i = 1; i <= horizontal && i < src->width; i++){
 		if(oppositeDirection){
 			origRegion = cvRect( i, 0, origRegion.width, origRegion.height);
 			shiftedRegion = cvRect( 0, 0, src->width - i, src->height );
@@ -250,3 +251,99 @@ IplImage *shiftImage(const IplImage *src, int vertical, int horizontal){
 	cvResetImageROI(imageShifted);
 	return imageShifted;
 }
+
+IplImage *shiftImageRot(const IplImage *src, int vertical, int horizontal){
+	IplImage *imageShifted;
+	IplImage *origImage;
+	CvSize size;
+	CvSize size2;
+	CvRect origRegion;
+	CvRect shiftedRegion;
+	bool oppositeDirection;
+
+	// Create a new image to copy to
+	size.width = cvRound(src->width);
+	size.height = cvRound(src->height);
+	imageShifted = cvCreateImage(size, src->depth, src->nChannels);
+	origImage = cvCreateImage(size, src->depth, src->nChannels);
+	cvCopy(src,origImage);
+	
+	oppositeDirection = (vertical < 0);
+	if(oppositeDirection){
+		vertical *= -1;
+	}
+
+	//Copy 1st portion
+	if(oppositeDirection){
+		origRegion = cvRect( 0, vertical, src->width, src->height );
+		shiftedRegion = cvRect( 0, 0, src->width, src->height-vertical );
+	}else{
+		origRegion = cvRect( 0, 0, src->width, src->height - vertical);
+		shiftedRegion = cvRect( 0, vertical, origRegion.width, origRegion.height );
+	}
+
+	cvSetImageROI(origImage,origRegion);
+	cvSetImageROI(imageShifted,shiftedRegion);
+
+	cvCopy(origImage, imageShifted);
+
+	//Copy 2nd portion
+	if(oppositeDirection){
+		origRegion = cvRect( 0, 0, src->width, vertical );
+		shiftedRegion = cvRect( 0, src->height-vertical, origRegion.width, src->height );
+	}else{
+		origRegion = cvRect( 0, src->height - vertical, src->width, src->height );
+		shiftedRegion = cvRect( 0, 0, origRegion.width, vertical);
+	}
+
+	cvSetImageROI(origImage,origRegion);
+	cvSetImageROI(imageShifted,shiftedRegion);
+
+	cvCopy(origImage, imageShifted);
+
+	/*
+	cvSetImageROI(origImage,origRegion);
+	cvSetImageROI(imageShifted,shiftedRegion);
+
+	cvCopy(origImage, imageShifted);
+
+	cvResetImageROI(imageShifted);
+	cvResetImageROI(origImage);
+	cvCopy(imageShifted,origImage);	
+
+	oppositeDirection = (horizontal < 0);
+	if(oppositeDirection){
+		horizontal *= -1;
+	}
+	for(int i = 1; i <= horizontal && i < src->width; i++){
+		if(oppositeDirection){
+			origRegion = cvRect( i, 0, origRegion.width, origRegion.height);
+			shiftedRegion = cvRect( 0, 0, src->width - i, src->height );
+		}else{
+			origRegion = cvRect( 0, 0, src->width - i, src->height);
+			shiftedRegion = cvRect( i, 0, origRegion.width, origRegion.height);
+		}
+		cvSetImageROI(origImage,origRegion);
+		cvSetImageROI(imageShifted,shiftedRegion);
+
+		cvCopy(origImage, imageShifted);
+	
+		if(oppositeDirection){
+			origRegion = cvRect( 0, 0, i, origRegion.height);
+			shiftedRegion = cvRect( src->width - i, 0, src->width, src->height );
+		}else{
+			origRegion = cvRect( src->width - i, 0, src->width, src->height);
+			shiftedRegion = cvRect( 0, 0, i, origRegion.height);
+		}
+		cvSetImageROI(origImage,origRegion);
+		cvSetImageROI(imageShifted,shiftedRegion);
+
+		cvCopy(origImage, imageShifted);
+	}
+	*/
+	cvResetImageROI((IplImage*)src);
+	cvResetImageROI(imageShifted);
+	return imageShifted;
+}
+
+
