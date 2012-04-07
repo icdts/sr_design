@@ -1,3 +1,4 @@
+**gen_window
 get_images_from_files.m
 pocs.m
 *popupmessage.m
@@ -11,3 +12,4 @@ sr_one_step_wb.m
 subpixel_register.m
 
 *possibly trivial
+**code has errors
