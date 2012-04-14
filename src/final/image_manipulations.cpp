@@ -314,3 +314,39 @@ void copyRegion(IplImage *src, IplImage *dest, int x1, int y1, int w1, int h1, i
 
 	cvCopy(src,dest);
 }
+
+/*
+	This shfts the image as directed by up_down and left_right and then shrinks 
+	the image by a ratio of 1/downsample_ratio
+*/
+IplImage *genShiftDownsampleImage(const IplImage *src, int up_down, int left_right, int downsample_ratio){	
+	IplImage *origImage;
+	IplImage *gsdsImage;
+	CvSize size;
+	CvSize size2;
+
+	size.width = cvRound( src->width );
+	size.height = cvRound( src->height );
+	origImage = cvCreateImage( size, src->depth, src->nChannels );
+	cvCopy( src, origImage );
+
+	// The image is cropped to dimensions that are divisible by the downsample value
+	// so that they can be more cleanly resized.
+	size2.width = cvRound( size.width - (size.width % downsample_ratio) );
+	size2.height = cvRound( size.height - (size.height % downsample_ratio) );
+	  
+	//If either dimension isn't divisble by the downsample value, redefine the region 
+	if( size.width != size2.width || size.height != size2.height ){
+		cvSetImageROI( origImage, cvRect( 0, 0, size2.width, size2.height ) );
+	}
+
+	// Creates image with size equal to either the size of the original image or the region of
+	// interest specified above.
+	gsdsImage = cvCreateImage( cvGetSize( origImage ), origImage->depth, origImage->nChannels );
+	cvCopy( origImage, gsdsImage );
+	cvReleaseImage( &origImage );
+	gsdsImage = shiftImage( gsdsImage, up_down, left_right );
+	gsdsImage = resizeImage( gsdsImage, gsdsImage->width/downsample_ratio, gsdsImage->height/downsample_ratio, false);
+
+	return gsdsImage;
+}
