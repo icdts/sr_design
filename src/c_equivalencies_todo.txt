@@ -2,7 +2,7 @@ These matlab files do not have complete cpp equivalencies yet:
 
 **gen_window
 *get_images_from_files.m
-pocs.m
+**pocs.m
 *popupmessage.m
 reg_gui.m
 register_color_image.m
