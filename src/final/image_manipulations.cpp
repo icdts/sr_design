@@ -320,15 +320,15 @@ void copyRegion(IplImage *src, IplImage *dest, int x1, int y1, int w1, int h1, i
 	the image by a ratio of 1/downsample_ratio
 */
 IplImage *genShiftDownsampleImage(const IplImage *src, int up_down, int left_right, int downsample_ratio){	
-	IplImage *origImage;
-	IplImage *gsdsImage;
+	IplImage *orig_image;
+	IplImage *gsds_image;
 	CvSize size;
 	CvSize size2;
 
 	size.width = cvRound( src->width );
 	size.height = cvRound( src->height );
-	origImage = cvCreateImage( size, src->depth, src->nChannels );
-	cvCopy( src, origImage );
+	orig_image = cvCreateImage( size, src->depth, src->nChannels );
+	cvCopy( src, orig_image );
 
 	// The image is cropped to dimensions that are divisible by the downsample value
 	// so that they can be more cleanly resized.
@@ -337,16 +337,16 @@ IplImage *genShiftDownsampleImage(const IplImage *src, int up_down, int left_rig
 	  
 	//If either dimension isn't divisble by the downsample value, redefine the region 
 	if( size.width != size2.width || size.height != size2.height ){
-		cvSetImageROI( origImage, cvRect( 0, 0, size2.width, size2.height ) );
+		cvSetImageROI( orig_image, cvRect( 0, 0, size2.width, size2.height ) );
 	}
 
 	// Creates image with size equal to either the size of the original image or the region of
 	// interest specified above.
-	gsdsImage = cvCreateImage( cvGetSize( origImage ), origImage->depth, origImage->nChannels );
-	cvCopy( origImage, gsdsImage );
-	cvReleaseImage( &origImage );
-	gsdsImage = shiftImage( gsdsImage, up_down, left_right );
-	gsdsImage = resizeImage( gsdsImage, gsdsImage->width/downsample_ratio, gsdsImage->height/downsample_ratio, false);
+	gsds_image = cvCreateImage( cvGetSize( orig_image ), orig_image->depth, orig_image->nChannels );
+	cvCopy( orig_image, gsds_image );
+	cvReleaseImage( &orig_image );
+	gsds_image = shiftImage( gsds_image, up_down, left_right );
+	gsds_image = resizeImage( gsds_image, gsds_image->width/downsample_ratio, gsds_image->height/downsample_ratio, false);
 
-	return gsdsImage;
+	return gsds_image;
 }
