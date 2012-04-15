@@ -1,1 +1,1 @@
-./resize_test /usr/share/pixmaps/faces/coffee.jpg
+./test_pocs /usr/share/pixmaps/faces/coffee.jpg
