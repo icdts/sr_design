@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include "../test_subpixel_register/subpixel_register.h"
+#include "../final/image_manipulations.h"
 
 using namespace std;
 using namespace cv;
@@ -13,7 +14,7 @@ struct shifts{
 	float x;
 };
 
-vector <float[290]> scores;
+//vector <float[290]> scores;
 float shiftx = 0, shifty = 0;
 float prob = 0;
 
@@ -41,7 +42,7 @@ int main(int argc, char* argv[]){
 }
 
 IplImage *sr_one_step_wb(const IplImage *src, vector <IplImage> input){
-	float tmp_sh;
+	//float tmp_sh;
 	vector <shifts> shs;
 	vector <float> probs;
 	//float score_array[290];
