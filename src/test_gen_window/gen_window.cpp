@@ -26,8 +26,6 @@ int main(int argc, char* argv[]){
 
 	image = cvLoadImage(argv[1], CV_LOAD_IMAGE_COLOR); // Read the file
 
-	namedWindow( "Display window", CV_WINDOW_AUTOSIZE );// Create a window for display.
-
 	Mat matthew = gen_window(image->height, image->width, 0.1, 0.5/*, image->depth, image->nChannels*/);
 	imshow("NINETY SIX TEARS", matthew);
 	waitKey(0);
