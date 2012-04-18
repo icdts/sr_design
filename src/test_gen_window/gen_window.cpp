@@ -10,7 +10,7 @@
 using namespace std;
 using namespace cv;
 
-Mat gen_window(int height, int width, float d1, float d2, int depth, int nChannels);
+Mat gen_window(int height, int width, float d1, float d2/*, int depth, int nChannels*/);
 IplImage* cropImage(const IplImage *img, const CvRect region);
 IplImage* resizeImage(const IplImage *origImg, int newWidth, int newHeight, bool keepAspectRatio);
 
@@ -28,12 +28,13 @@ int main(int argc, char* argv[]){
 
 	namedWindow( "Display window", CV_WINDOW_AUTOSIZE );// Create a window for display.
 
-	IplImage newImage = gen_window(image->height, image->width, 0.1, 0.1, image->depth, image->nChannels);
-
+	Mat matthew = gen_window(image->height, image->width, 0.1, 0.5/*, image->depth, image->nChannels*/);
+	imshow("NINETY SIX TEARS", matthew);
+	waitKey(0);
 	//IplImage image2 = w;
 
 
-	cvShowImage( "Display window", &newImage ); // Show our image inside it.
+	//cvShowImage( "Display window", &newImage ); // Show our image inside it.
 
 
 	cvReleaseImage(&image);
@@ -43,87 +44,41 @@ int main(int argc, char* argv[]){
 Results in a height by width matrix where all borders are 0 and the middle
 is 1 with height*d1 numbers fading from 1 to 0 at each x edge and width*d2 at
 each y edge*/ 
-Mat gen_window(int height, int width, float d1, float d2, int depth, int nChannels)
+Mat gen_window(int s1, int s2, float d1, float d2)
 {
-	CvSize size;
-	size.height = height;
-	size.width = width;
-	CvScalar s;
-
-	IplImage* retval = cvCreateImage(size, depth, nChannels);
-
-	//Create an height by 1 matrix (column matrix) filled with ones
-	size.width = 1;
-	IplImage* x = cvCreateImage(size, depth, nChannels);
-	cvSet(x, CV_RGB(255, 255, 255));
-	int steps = height * d1;
+	//Create an s1 by 1 matrix (column matrix) filled with ones
+	Mat x = Mat::ones(s2, 1, CV_32F);
+	//CvMat x = 
+	int steps = s2 * d2;
+	float slope = 0;
 	float increment = 1.0/(steps - 1);
-	CvPoint pt;
-	/*Create a linear vector (row matrix) with height*d1 evenly spaced numbers
+
+	/*Create a linear vector (row matrix) with s2*d2 evenly spaced numbers
 	between 0 and 1; a, b, c, etc.
 	results in array a,b,c,1,1,1,1,1,1,1,c,b,a */
-
-	int ct = 0; //This counter is used as the pixel index.
-	for(float slope = 0; slope<1.0; slope += increment){
-		s = cvGet2D(x, ct, 0); // get the (i,j) pixel value
-		s.val[0] = 255.0 * slope;
-		s.val[1] = 255.0 * slope;
-		s.val[2] = 255.0 * slope;
-		printf("B=%f, G=%f, R=%f\n",s.val[0],s.val[1],s.val[2]);
-		cvSet2D(x, ct, 0, s); // set the (i,j) pixel value
-		
-		s = cvGet2D(x, height - 1 - ct, 0); // get the (i,j) pixel value
-		s.val[0] = 255.0 * slope;
-		s.val[1] = 255.0 * slope;
-		s.val[2] = 255.0 * slope;
-		printf("B=%f, G=%f, R=%f\n",s.val[0],s.val[1],s.val[2]);
-		cvSet2D(x, height - 1 - ct++, 0, s); 
+	for(int i=0; i<steps; i++){
+		x.at<float>(i, 0) = slope;
+		x.at<float>(s2 - 1 - i, 0) = slope;
+		slope = slope + increment;
 	}
-	
-	size.width = width;
-	size.height = 1;
-	IplImage* y = cvCreateImage(size, depth, nChannels);
-	cvSet(y, CV_RGB(255, 255, 255));
-	steps = width * d2;
+
+	Mat y = Mat::ones(1, s1, CV_32F);
+	steps = s1 * d1;
+	slope = 0;
 	increment = 1.0/(steps - 1);
 
-	ct = 0;
-	/*Create a linear vector (row matrix) with width*d1 evenly spaced numbers
+	/*Create a linear vector (row matrix) with s1*d1 evenly spaced numbers
 	between 0 and 1; a, b, c, etc.
 	results in array a,b,c,1,1,1,1,1,1,1,c,b,a */
-	for(float slope = 0; slope<1.0; slope += increment){
-		s = cvGet2D(y, 0, ct); // get the (i,j) pixel value
-		s.val[0] = 255.0 * slope;
-		s.val[1] = 255.0 * slope;
-		s.val[2] = 255.0 * slope;
-		cvSet2D(y, 0, ct, s); // set the (i,j) pixel value
-
-		s = cvGet2D(y, 0, width - 1 - ct); // get the (i,j) pixel value
-		s.val[0] = 255.0 * slope;
-		s.val[1] = 255.0 * slope;
-		s.val[2] = 255.0 * slope;
-		cvSet2D(y, 0, width - 1 - ct++, s); 
+	for(int i=0; i<steps; i++){
+		y.at<float>(0, i) = slope;
+		y.at<float>(0, s1 - 1 - i) = slope;
+		slope = slope + increment;
 	}
 
-	Mat Mx;
-	Mat tmp = Mat(x, true); //true lets it copy the image contents
-	tmp.convertTo(Mx, CV_32F); //default seems to be CV_8U
-
-	Mat My;
-	Mat tmp1 = Mat(y, true); //true lets it copy the image contents
-	tmp1.convertTo(My, CV_32F); //default seems to be CV_8U
-
-	Mat Mretval;
-	Mat tmp2 = Mat(retval, true); //true lets it copy the image contents
-	tmp2.convertTo(Mretval, CV_32F); //default seems to be CV_8U
-
-	Mretval = Mx * My;
-
-	cvReleaseImage(&retval);
-	cvReleaseImage(&x);
-	cvReleaseImage(&y);
-	
-	return Mretval;
+	Mat z = Mat(s2, s1, CV_32F);
+	z = x * y;
+	return z;
 }
 
 // Returns a new image that is a cropped version (rectangular cut-out)
