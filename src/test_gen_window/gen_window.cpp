@@ -28,7 +28,7 @@ int main(int argc, char* argv[]){
 
 	namedWindow( "Display window", CV_WINDOW_AUTOSIZE );// Create a window for display.
 
-	Mat matthew = gen_window(image->height, image->width, 0.1, 0.1/*, image->depth, image->nChannels*/);
+	Mat matthew = gen_window(image->height, image->width, 0.1, 0.5/*, image->depth, image->nChannels*/);
 	imshow("NINETY SIX TEARS", matthew);
 	waitKey(0);
 	//IplImage image2 = w;
@@ -46,38 +46,37 @@ is 1 with height*d1 numbers fading from 1 to 0 at each x edge and width*d2 at
 each y edge*/ 
 Mat gen_window(int s1, int s2, float d1, float d2)
 {
-	Mat *w;
 	//Create an s1 by 1 matrix (column matrix) filled with ones
-	Mat x = Mat::ones(s1, 1, CV_32F);
+	Mat x = Mat::ones(s2, 1, CV_32F);
 	//CvMat x = 
-	int steps = s1 * d1;
+	int steps = s2 * d2;
 	float slope = 0;
-	float increment = 1/(steps - 1);
+	float increment = 1.0/(steps - 1);
+
+	/*Create a linear vector (row matrix) with s2*d2 evenly spaced numbers
+	between 0 and 1; a, b, c, etc.
+	results in array a,b,c,1,1,1,1,1,1,1,c,b,a */
+	for(int i=0; i<steps; i++){
+		x.at<float>(i, 0) = slope;
+		x.at<float>(s2 - 1 - i, 0) = slope;
+		slope = slope + increment;
+	}
+
+	Mat y = Mat::ones(1, s1, CV_32F);
+	steps = s1 * d1;
+	slope = 0;
+	increment = 1.0/(steps - 1);
 
 	/*Create a linear vector (row matrix) with s1*d1 evenly spaced numbers
 	between 0 and 1; a, b, c, etc.
 	results in array a,b,c,1,1,1,1,1,1,1,c,b,a */
 	for(int i=0; i<steps; i++){
-		x.at<float>(i, 0) = slope;
-		x.at<float>(s1 - 1 - i, 0) = slope;
-		slope = slope + increment;
-	}
-
-	Mat y = Mat::ones(1, s2, CV_32F);
-	steps = s2 * d2;
-	slope = 0;
-	increment = 1/(steps - 1);
-
-	/*Create a linear vector (row matrix) with s2*d1 evenly spaced numbers
-	between 0 and 1; a, b, c, etc.
-	results in array a,b,c,1,1,1,1,1,1,1,c,b,a */
-	for(int i=0; i<steps; i++){
 		y.at<float>(0, i) = slope;
-		y.at<float>(0, s2 - 1 - i) = slope;
+		y.at<float>(0, s1 - 1 - i) = slope;
 		slope = slope + increment;
 	}
 
-	Mat z = Mat(s1, s2, CV_32F);
+	Mat z = Mat(s2, s1, CV_32F);
 	z = x * y;
 	return z;
 }

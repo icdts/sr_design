@@ -1,1 +1,1 @@
-./gen_window_test /usr/share/pixmaps/faces/coffee.jpg
+./gen_window_test ~/Desktop/lol.jpg
