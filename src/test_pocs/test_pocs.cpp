@@ -51,15 +51,15 @@ int main(int argc, char* argv[]){
 	if( argc != 2) {
 		cout <<" Usage: display_image ImageToLoadAndDisplay" << endl;
 		return -1;
-    }
+	}
 
 	int rescale_factor = 2;
 
-    IplImage *image;
+	IplImage *image;
 	IplImage *resize;
 
 	//Read in Image
-    image = cvLoadImage(argv[1], CV_LOAD_IMAGE_COLOR);
+	image = cvLoadImage(argv[1], CV_LOAD_IMAGE_COLOR);
 	
 	size.width = image->width*50;
 	size.height = image->height*50;
@@ -68,14 +68,14 @@ int main(int argc, char* argv[]){
 	cvResize(image,resize,CV_INTER_AREA);
 	
 	//Show all the images
-    namedWindow( "original", CV_WINDOW_AUTOSIZE );
-    namedWindow( "shifted", CV_WINDOW_AUTOSIZE );
-    cvShowImage( "original", image);
-    cvShowImage( "shifted",	resize);
-    waitKey(0);
+	namedWindow( "original", CV_WINDOW_AUTOSIZE );
+	namedWindow( "shifted", CV_WINDOW_AUTOSIZE );
+	cvShowImage( "original", image);
+	cvShowImage( "shifted",	resize);
+	waitKey(0);
 
 	//Release memory
 	cvReleaseImage(&image);
 	cvReleaseImage(&resize);
-    return 0;	
+	return 0;	
 }
