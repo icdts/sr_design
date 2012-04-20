@@ -4,10 +4,12 @@ using namespace std;
 using namespace cv;
 
 //TODO: Comment better, prolog
-cv::Mat shiftMat(cv::Mat src, int vertical, int horizontal){
+cv::Mat shiftMat(cv::Mat input, int vertical, int horizontal){
+	cv::Mat src;
 	cv::Mat image_shifted;
 	bool opposite_direction;
 
+	input.copyTo(src);
 	src.copyTo(image_shifted);
 
 	opposite_direction = (vertical < 0);
@@ -57,10 +59,12 @@ cv::Mat shiftMat(cv::Mat src, int vertical, int horizontal){
 }
 
 //TODO: Comment better, prolog
-cv::Mat shiftMatRot(cv::Mat src, int vertical, int horizontal){
+cv::Mat shiftMatRot(cv::Mat input, int vertical, int horizontal){
+	cv::Mat src;
 	cv::Mat image_shifted; //(size, src.depth(), src.channels());
 	bool opposite_direction;
 
+	input.copyTo(src);
 	src.copyTo(image_shifted);
 
 	/*	

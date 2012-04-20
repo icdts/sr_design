@@ -8,74 +8,64 @@
 #include <iostream>
 
 using namespace std;
-using namespace cv;
 
-Mat* register_image(const Mat* img1, const Mat* img2){
-    Mat* oim1, oim2; //original images
-    CvSize size1, size2;  //image sizes
-    cvScalar avg1,avg2;
+/*
+function [im2_reg,sh,f]=register_image(im1,im2)
+oim2=im2;
+w=gen_window(size(im1),0.05,0.05);
+im1=w.*im1; % mitigate boundary effect
+im2=w.*im2; % by using w as a kernel
+%dot-star is entry-by-entry multiplication
 
-    size1.width = img1->width;
-    size1.height = img1->height;
+%matrix right division (mrdivide)
+%must have same number of columns
 
-    size2.width = img1->width;
-    size2.height = img2->height;
+%mean(im(:)) returns a single value for mean of all elements
+im1=im1/mean(im1(:)); %pretend normalizing
+im2=im2/mean(im2(:));
 
-    oim1 = cvCreateImage(size, img1->depth, 1);
-    oim2 = cvCreateImage(size, img2->depth, 1);
-    //create copies
-    cvCopy(img1, oim1);
-    cvCopy(img2, oim2);
+%2D FFT on image 1 entry-by-entry multipled with FFT on image 2 rotated 180
+%degrees
+tmp=fft2(im1).*fft2(flipud(fliplr(im2)));
+f=fftshift(abs(ifft2(tmp))); %fftshift moves fft so zero frequency 
+                             %component is in middle, ifft2 inverse fft
+%find max value in the new image (value: dummy, index: shid)
+[dummy,shid]=max(f(:));
 
-    Mat kernel = generate_window(img1, 0.05, 0.05) //external function
+%make a point based on the middle of the image
+sh(1)=(mod(shid-1,size(im1,1))+1)-size(im1,1)/2;
+sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
+%shift the image based on the (new) midpoint?
+%this is still somewhat unclear
+im2_reg=shift_image(oim2,sh);
+*/
+cv::Mat register_image(cv::Mat im1, cv::Mat im2){
+    cv::Mat oim2;
+    cv::Mat window;
+    cv::Mat flipped_im2;
+    cv::Mat tmp1;
+    cv::Mat tmp2;
 
-    //assuming image 1 and 2 are the same size
-    if (kernel->width != img1->width || kernel->width != img1->width){
-    	cout << "ERROR: Image1 width is " << kernel->width
-    	     << "expected " << kernel->width << "\n";
-    	exit(1);
-    }
-    //TODO: More sanity checking for img1 and img2
+    im1.copyTo(oim2);
+    window = gen_window(im1.rows,im1.cols,0.05,0.05);
 
-    //source1, source2, destination
-    Mul(img1, kernel, img1);  // member by member multiply
-    Mul(img2, kernel, img2);  // cv functions, check output
+    im1 = window.multiply(im1);
+    im2 = window.multiply(im2);
 
-    //Get average value of all images
-    avg1 = Avg(img1);
-    avg2 = Avg(img2);
-  
-    /*
-        Invert, so that scaling will divide 
-        by these values.
-    */
-    for(int i = 0; i < img1->nChannels; i++){
-        avg1[i] = 1/avg1[i];
-        avg2[i] = 1/avg2[i];
-    }
+    im1 = im1.divide(cv::mean(im1));
+    im2 = im2.divide(cv::mean(im2));
 
-    img1 = cvConvertScale(img1,img1,1/avg1,0);
-    img2 = cvConvertScale(img2,img2,1/avg2,0);
+    //Flip left-right and up-down
+    cv::flip(im2,flipped_im2,-1);
+
+    //First fft2
+    dft(im1,tmp1,DFT_COMPLEX_OUTPUT);
+
+    //Second fft2
+    dft(flipped_im2,tmp2,DFT_COMPLEX_OUTPUT);
+
+    tmp1 = tmp1.multiply(tmp2);
     
-    //XXX: We have to do FFTs here and there aren't in OpenCV
-    //     check for FFTW online (makefiles will need a change)
-    //
-    // Don't know the math on this, just copying the matlab code
-    IblImage temp, f;
-    temp = FFT(img1) .* fft(rotateImage(img2, 180)); //external function
-    f = FFT_Shift(abs(inverse_FFT(temp));
-    //XXX: FFT_Shift could pose a problem Grant has a link for it, but ???
-    //     inverse should be included with FFTW
-
-    find maximum value in f;
-    shift_id = location of that value;
-
-    //XXX: Don't understand this part of the matlab yet, this isn't done
-    // make a point based on the middle of the image
-    sh(1)=(mod(shid-1,size(im1,1))+1)-size(im1,1)/2;
-    sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
-    //shift the image based on the (new) midpoint?
-    //this is still somewhat unclear
-    
-    return shift_image(oim2,sh); //external function
+    tmp2 = abs(idft(tmp1);
+    tmp1 = 
 }
