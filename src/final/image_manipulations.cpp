@@ -9,7 +9,7 @@ cv::Mat shiftMat(cv::Mat input, int vertical, int horizontal){
 	cv::Mat image_shifted;
 	bool opposite_direction;
 
-	input.copyTo(src);
+	input.copyTo(src); //Do deep copy, apparently this doesn't happen when passing
 	src.copyTo(image_shifted);
 
 	opposite_direction = (vertical < 0);
@@ -64,7 +64,7 @@ cv::Mat shiftMatRot(cv::Mat input, int vertical, int horizontal){
 	cv::Mat image_shifted; //(size, src.depth(), src.channels());
 	bool opposite_direction;
 
-	input.copyTo(src);
+	input.copyTo(src); //Do deep copy, apparently this doesn't happen when passing
 	src.copyTo(image_shifted);
 
 	/*	
