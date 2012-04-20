@@ -1,13 +1,4 @@
-#ifdef +MSC_VER
-	//XXX: Need something here?
-#else
-	#include <opencv/cv.h>
-	#include <opencv2/core/core.hpp>
-	#include <opencv2/highgui/highgui.hpp>
-#enfid
-#include <iostream>
-
-using namespace std;
+#include "register_image.h"
 
 /*
 function [im2_reg,sh,f]=register_image(im1,im2)
@@ -39,8 +30,6 @@ sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
 %this is still somewhat unclear
 im2_reg=shift_image(oim2,sh);
 */
-cv::Mat fftshift(cv::Mat & input);
-
 cv::Mat register_image(cv::Mat input1, cv::Mat input2){
     cv::Mat im1;
     cv::Mat im2;
@@ -60,13 +49,13 @@ cv::Mat register_image(cv::Mat input1, cv::Mat input2){
     input2.copyTo(im2);
 
     //Mitigate boundary effect
-    window = gen_window(im1.rows,im1.cols,0.05,0.05);
-    im1 = window.multiply(im1);
-    im2 = window.multiply(im2);
+    window = gen_window(im1.rows,im1.cols,0.05,0.05,im1.channels());
+    im1 = window.mul(im1);
+    im2 = window.mul(im2);
 
     //Normalize result
-    im1 = im1.divide(cv::mean(im1));
-    im2 = im2.divide(cv::mean(im2));
+    im1 = im1.mul(1/im1.mean());
+    im2 = im2.mul(1/im2.mean());
 
     //Flip left-right and up-down
     cv::flip(im2,flipped_im2,-1);
@@ -78,7 +67,7 @@ cv::Mat register_image(cv::Mat input1, cv::Mat input2){
     dft(flipped_im2,tmp2,DFT_COMPLEX_OUTPUT);
 
     //Multiply on element-by-element basis
-    tmp1 = tmp1.multiply(tmp2);
+    tmp1 = tmp1.mul(tmp2);
 
     //Reverse fft
     idft(tmp1,tmp2,DFT_COMPLEX_OUTPUT);
@@ -113,3 +102,4 @@ cv::Mat fftshift(const cv::Mat & input){
         }
     }
     return output;
+}
