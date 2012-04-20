@@ -12,7 +12,7 @@ using namespace cv;
 
 /* This function calls the subpixel_register function and creates the final super-resolution output. 
 It is given a source image (mainly for dimensions?) and the vector of input images, and returns a Mat.*/
-Mat sr_one_step_wb(Mat src, vector <input_image> input);
+Mat sr_one_step_wb(input_image src, vector <input_image> input);
 
 int main(int argc, char* argv[]){
 	if ( argc < 2) {
@@ -21,9 +21,9 @@ int main(int argc, char* argv[]){
     }
 
 int rescale_factor = 4;
-Mat image;
+input_image image;
 vector <input_image> input;
-image = imread(argv[1]);
+image.file = imread(argv[1]);
 Mat output = sr_one_step_wb(image, input);
 
 	return 0;
@@ -31,7 +31,7 @@ Mat output = sr_one_step_wb(image, input);
 
 /* This function calls the subpixel_register function and creates the final super-resolution output. 
 It is given a source image (mainly for dimensions?) and the vector of input images, and returns a Mat.*/
-Mat sr_one_step_wb(Mat src, vector <input_image> input){
+Mat sr_one_step_wb(input_image src, vector <input_image> input){
 	Mat kron_image;
 	
 	//calls sub_pixel register to assign shifts and probabilities for each input image
@@ -39,8 +39,8 @@ Mat sr_one_step_wb(Mat src, vector <input_image> input){
 		input[tid].prob = subpixel_register(src, input[tid], 4, -1);
 	}
 
-	Mat image(src.rows, src.cols, CV_32F, Scalar(0));
-	Mat sh_image(src.rows, src.cols, CV_32F, Scalar(0));
+	Mat image(src.file.rows, src.file.cols, CV_32F, Scalar(0));
+	Mat sh_image(src.file.rows, src.file.cols, CV_32F, Scalar(0));
 	for (int tid = 0; tid < input.size(); tid++){
 		//Resize image by a scale of 4, which was done with a kron product in matlab
 		Mat kron_image = Mat( image.size(), CV_64F );
