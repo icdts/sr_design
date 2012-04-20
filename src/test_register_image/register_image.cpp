@@ -39,19 +39,30 @@ sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
 %this is still somewhat unclear
 im2_reg=shift_image(oim2,sh);
 */
-cv::Mat register_image(cv::Mat im1, cv::Mat im2){
-    cv::Mat oim2;
+cv::Mat register_image(cv::Mat input1, cv::Mat input2){
+    cv::Mat im1;
+    cv::Mat im2;
     cv::Mat window;
     cv::Mat flipped_im2;
     cv::Mat tmp1;
     cv::Mat tmp2;
+    CvPoint max;
 
-    im1.copyTo(oim2);
+    int x;
+    int y;
+
+    int shid;
+
+    //Deep copies to keep from changing original
+    input1.copyTo(im1);
+    input2.copyTo(im2);
+
+    //Mitigate boundary effect
     window = gen_window(im1.rows,im1.cols,0.05,0.05);
-
     im1 = window.multiply(im1);
     im2 = window.multiply(im2);
 
+    //Normalize result
     im1 = im1.divide(cv::mean(im1));
     im2 = im2.divide(cv::mean(im2));
 
@@ -64,8 +75,26 @@ cv::Mat register_image(cv::Mat im1, cv::Mat im2){
     //Second fft2
     dft(flipped_im2,tmp2,DFT_COMPLEX_OUTPUT);
 
+    //Multiply on element-by-element basis
     tmp1 = tmp1.multiply(tmp2);
-    
-    tmp2 = abs(idft(tmp1);
-    tmp1 = 
+
+    //Reverse fft
+    idft(tmp1,tmp2,DFT_COMPLEX_OUTPUT);
+
+    //Shift zero frequencies to the middle
+    tmp2 = fftshift(abs(tmp2));
+
+    //Find maximum element
+    minMaxLoc(tmp2,NULL,NULL,NULL,&max);
+
+    //replicating Matlab, no good explination
+    shid = (max.x * tmp2.rows) + max.y;
+
+    //%make a point based on the middle of the image
+    //sh(1)=(mod(shid-1,size(im1,1))+1)-size(im1,1)/2;
+    //sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
+    x = (((shid-1)%im1.rows) + 1) - (im1.rows/2);
+    y = Math.ceil((shid-1)/im1.rows) - (im1.rows/2);
+
+    return shiftImage(input2,x,y);   
 }
