@@ -39,6 +39,8 @@ sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
 %this is still somewhat unclear
 im2_reg=shift_image(oim2,sh);
 */
+cv::Mat fftshift(cv::Mat & input);
+
 cv::Mat register_image(cv::Mat input1, cv::Mat input2){
     cv::Mat im1;
     cv::Mat im2;
@@ -98,3 +100,16 @@ cv::Mat register_image(cv::Mat input1, cv::Mat input2){
 
     return shiftImage(input2,x,y);   
 }
+cv::Mat fftshift(const cv::Mat & input){
+    cv::Mat output = input.clone();
+    int half_x = input.rows / 2;
+    int half_y = input.cols / 2;
+    int new_i, new_j;
+    for(int i=0; i<input.rows; i++){
+        for(int j=0; j<input.cols; j++){
+            new_i = (i + half_x) % input.rows;
+            new_j = (j + half_y) % input.cols;
+            output.at<uchar>(new_i,new_j) = input.at<uchar>(i,j);
+        }
+    }
+    return output;
