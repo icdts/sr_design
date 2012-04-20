@@ -14,7 +14,7 @@ struct input_image {
 	cv::Mat file;
 	int vertical_shift;
 	int horizontal_shift;
-
+	float prob;
 	float * scores[];
 };
 
