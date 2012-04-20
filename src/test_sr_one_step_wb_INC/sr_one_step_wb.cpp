@@ -9,7 +9,9 @@
 
 using namespace std;
 using namespace cv;
- 
+
+/* This function calls the subpixel_register function and creates the final super-resolution output. 
+It is given a source image (mainly for dimensions?) and the vector of input images, and returns a Mat.*/
 Mat sr_one_step_wb(Mat src, vector <input_image> input);
 
 int main(int argc, char* argv[]){
@@ -27,36 +29,27 @@ Mat output = sr_one_step_wb(image, input);
 	return 0;
 }
 
+/* This function calls the subpixel_register function and creates the final super-resolution output. 
+It is given a source image (mainly for dimensions?) and the vector of input images, and returns a Mat.*/
 Mat sr_one_step_wb(Mat src, vector <input_image> input){
 	Mat kron_image;
 	
+	//calls sub_pixel register to assign shifts and probabilities for each input image
 	for (int tid = 0; tid < input.size(); tid++){
-		input[tid].prob = subpixel_register(src,&input[tid], 4, -1);
-		//fills the probability in the probs vector corresponding to the input
-		//image id with its prob from subpixel_register
-		//probs.push_back(prob);
-		//replaces the row in shs corresponding to the input image id with
-        //its shift value from subpixel_register
-		//shs[tid].x = shiftx;
-		//shs[tid].y = shifty;
-		//replaces the index in scores corresponding to the input image id with
-        //its scores from subpixel_register
-		//scores.push_back(score_array);
+		input[tid].prob = subpixel_register(src, input[tid], 4, -1);
 	}
 
 	Mat image(src.rows, src.cols, CV_32F, Scalar(0));
 	Mat sh_image(src.rows, src.cols, CV_32F, Scalar(0));
 	for (int tid = 0; tid < input.size(); tid++){
-		CvSize size;
-		size.width = input[tid].file.cols * 4;
-		size.height = input[tid].file.rows * 4;
 		//Resize image by a scale of 4, which was done with a kron product in matlab
-		kron_image = cvCreateImage(size, input[tid].depth, input[tid].nChannels);
-		cvResize(&input[tid], kron_image, CV_INTER_AREA);
+		Mat kron_image = Mat( image.size(), CV_64F );
+		resize(image, kron_image, kron_image.size(), 0, 0, CV_INTER_AREA);
 		//if the probability for the input image is high, add the shift to the output
 		if (input[tid].prob > 0.9){
 			sh_image=shiftImage(kron_image, -input[tid].vertical_shift, -input[tid].horizontal_shift);
 			image += sh_image;
 		}
 	}
+	return image;
 }
