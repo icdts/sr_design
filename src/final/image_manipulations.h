@@ -6,7 +6,7 @@
 #endif
 #include <iostream>
 
-cv::Mat shiftImage(cv::Mat, int, int);
-cv::Mat shiftImageRot(cv::Mat, int, int);
-cv::Mat genShiftDownsampleImage(cv::Mat, int, int, int);
-void copyRegion(cv::Mat, cv::Mat, int, int, int, int, int, int, int, int);
+cv::Mat shiftMat(cv::Mat, int, int);
+cv::Mat shiftMatRot(cv::Mat, int, int);
+cv::Mat genShiftDownsampleMat(cv::Mat, int, int, int);
+void copyRegion(cv::Mat&, cv::Mat&, int, int, int, int, int, int, int, int);
