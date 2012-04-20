@@ -3,7 +3,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include <sys/types.h>
-#include <dirent.h>
+//#include <dirent.h>
 #include <errno.h>
 #include <vector>
 #include <string>
