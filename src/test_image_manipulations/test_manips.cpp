@@ -11,49 +11,46 @@ int main(int argc, char* argv[]){
 
 	int rescale_factor = 2;
 
-    IplImage *image;
-	IplImage *bigger_image;
-	IplImage *rotated_image;
-	IplImage *shifted_image;
-	IplImage *shifted_image2;
-	IplImage *shifted_image3;
-	IplImage *shifted_image4;
+    cv::Mat image;
+	cv::Mat bigger_image;
+	cv::Mat rotated_image;
+	cv::Mat shifted_image;
+	cv::Mat shifted_image2;
+	cv::Mat shifted_image3;
+	cv::Mat shifted_image4;
+	cv::Mat shifted_image5;
+	cv::Mat shifted_image6;
+	cv::Mat shifted_image7;
+	cv::Mat shifted_image8;
 
 	//Read in Image
-    image = cvLoadImage(argv[1], CV_LOAD_IMAGE_COLOR);
+    image = cv::imread(argv[1], CV_LOAD_IMAGE_COLOR);
 
 	//Transform image
-	bigger_image = resizeImage(image,image->width*rescale_factor,image->height*rescale_factor,false);
-	rotated_image = rotateImage(image,180);
+	cv::resize(image,bigger_image,Size(0,0),5,5,INTER_LINEAR);
+	cv::flip(image,rotated_image,-1);
 	shifted_image = shiftImageRot(image,0,25);
 	shifted_image2 = shiftImageRot(image,0,-25);
 	shifted_image3 = shiftImageRot(image,25,0);
 	shifted_image4 = shiftImageRot(image,-25,0);
-
+	shifted_image5 = shiftImageRot(image,0,25);
+	shifted_image6 = shiftImageRot(image,0,-25);
+	shifted_image7 = shiftImageRot(image,25,0);
+	shifted_image8 = shiftImageRot(image,-25,0);
 	//Show all the images
-    namedWindow( "original", CV_WINDOW_AUTOSIZE );
-    namedWindow( "bigger", CV_WINDOW_AUTOSIZE );
-    namedWindow( "rotated", CV_WINDOW_AUTOSIZE );
-    namedWindow( "shifted", CV_WINDOW_AUTOSIZE );
-    namedWindow( "shifted2", CV_WINDOW_AUTOSIZE );
-    namedWindow( "shifted3", CV_WINDOW_AUTOSIZE );
-    namedWindow( "shifted4", CV_WINDOW_AUTOSIZE );
-    cvShowImage( "original", image );
-    cvShowImage( "bigger", bigger_image );
-    cvShowImage( "rotated", rotated_image );
-    cvShowImage( "shifted",	shifted_image );
-    cvShowImage( "shifted2",shifted_image2 );
-    cvShowImage( "shifted3",shifted_image3 );
-    cvShowImage( "shifted4",shifted_image4 );
+    cv::imshow( "original", image );
+    cv::imshow( "bigger", bigger_image );
+    cv::imshow( "rotated", rotated_image );
+    cv::imshow( "shiftedRot1",	shifted_image );
+    cv::imshow( "shiftedRot2",shifted_image2 );
+    cv::imshow( "shiftedRot3",shifted_image3 );
+    cv::imshow( "shiftedRot4",shifted_image4 );
+    cv::imshow( "shifted5",	shifted_image );
+    cv::imshow( "shifted6",shifted_image2 );
+    cv::imshow( "shifted7",shifted_image3 );
+    cv::imshow( "shifted8",shifted_image4 );
+
     waitKey(0);
 
-	//Release memory
-	cvReleaseImage(&image);
-	cvReleaseImage(&bigger_image);
-	cvReleaseImage(&rotated_image);
-	cvReleaseImage(&shifted_image);
-	cvReleaseImage(&shifted_image2);
-	cvReleaseImage(&shifted_image3);
-	cvReleaseImage(&shifted_image4);
     return 0;	
 }

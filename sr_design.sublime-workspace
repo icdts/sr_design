@@ -3,17 +3,70 @@
 	{
 		"selected_items":
 		[
+			[
+				"dis",
+				"discrimin_cons"
+			],
+			[
+				"dir",
+				"dirp"
+			]
 		]
 	},
-	"buffers":
-	[
-	],
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 52.0,
+		"height": 392.0,
 		"selected_items":
 		[
+			[
+				":w",
+				":w - Save"
+			],
+			[
+				":x",
+				"Set Syntax: XSL"
+			],
+			[
+				"git: comm",
+				"Git: Commit"
+			],
+			[
+				"git add",
+				"Git: Add..."
+			],
+			[
+				"Git: cus",
+				"Git: Custom Command"
+			],
+			[
+				"git:cus",
+				"Git: Custom Command"
+			],
+			[
+				"git:cu",
+				"Git: Custom Command"
+			],
+			[
+				"git: ch",
+				"Git: Change Branch"
+			],
+			[
+				"Git: commit",
+				"Git: Commit"
+			],
+			[
+				"Git: ad",
+				"Git: Add..."
+			],
+			[
+				"Package Control: Rem",
+				"Package Control: Remove Package"
+			],
+			[
+				":",
+				":w - Save"
+			],
 			[
 				"Package Control: insta",
 				"Package Control: Install Package"
@@ -31,7 +84,7 @@
 				"Package Control: Install Package"
 			]
 		],
-		"width": 449.0
+		"width": 602.0
 	},
 	"console":
 	{
@@ -48,21 +101,41 @@
 	},
 	"file_history":
 	[
-		"/home/rnolan/workspace/spring2012/sd/sr_design/src/test_image_manipulations/Makefile",
+		"/home/rnolan/.config/sublime-text-2/Packages/User/Preferences.sublime-settings",
+		"/home/rnolan/workspace/spring2012/ai/project2/test.rb",
+		"/home/rnolan/.cache/.fr-UmnGBi/2D-fft-ifft_example/2D-fft-ifft_example.c",
+		"/home/rnolan/.cache/.fr-vQ3p01/2D-fft-ifft_example/2D-fft-ifft_example.c",
+		"/home/rnolan/workspace/spring2012/ai/project2/preference_solver.rb",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/src/test_load_images/test_load_images.cpp",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/src/test_load_images/load_images.cpp",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/src/test_load_images/load_images.h",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/src/test_load_images/Makefile",
 		"/home/rnolan/workspace/spring2012/sd/sr_design/src/test_image_manipulations/test_manips.cpp",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/src/c_equivalencies_todo.txt",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/sr_demo/register_color_image.m",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/sr_demo/register_image.m",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/src/test_register_image/register_image.cpp",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/src/test_load_image/load_images.h",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/src/test_load_image/load_images.cpp",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/src/final/image_manipulations.cpp",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/sr_demo/get_images_from_files.m",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/sr_design.sublime-project",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/sr_design.sublime-workspace",
+		"/home/rnolan/workspace/spring2012/sd/sr_design/src/test_image_manipulations/Makefile",
 		"/home/rnolan/workspace/jge3d/src/test/Main.java",
 		"/home/rnolan/workspace/spring2012/ai/project2/server.rb",
 		"/home/rnolan/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings"
 	],
 	"find":
 	{
-		"height": 0.0
+		"height": 34.0
 	},
 	"find_in_files":
 	{
 		"height": 0.0,
 		"where_history":
 		[
+			"<open folders>"
 		]
 	},
 	"find_state":
@@ -70,6 +143,12 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"open",
+			"git_dir",
+			"input_file",
+			"struct ",
+			"register_image",
+			"IplImage"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -77,6 +156,9 @@
 		"regex": false,
 		"replace_history":
 		[
+			"input_image",
+			"",
+			"Mat"
 		],
 		"reverse": false,
 		"show_context": true,
@@ -84,21 +166,13 @@
 		"whole_word": false,
 		"wrap": true
 	},
-	"groups":
-	[
-		{
-			"sheets":
-			[
-			]
-		}
-	],
 	"incremental_find":
 	{
-		"height": 0.0
+		"height": 34.0
 	},
 	"input":
 	{
-		"height": 0.0
+		"height": 31.0
 	},
 	"layout":
 	{
@@ -125,7 +199,7 @@
 	"menu_visible": true,
 	"replace":
 	{
-		"height": 0.0
+		"height": 62.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -133,6 +207,14 @@
 		"height": 0.0,
 		"selected_items":
 		[
+			[
+				"t",
+				"test.rb"
+			],
+			[
+				"pr",
+				"preference_solver.rb"
+			]
 		],
 		"width": 0.0
 	},
@@ -148,6 +230,6 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 260.0,
+	"side_bar_width": 124.0,
 	"status_bar_visible": true
 }

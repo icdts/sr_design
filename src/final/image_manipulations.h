@@ -6,10 +6,7 @@
 #endif
 #include <iostream>
 
-IplImage *cropImage(IplImage *, CvRect);
-IplImage *resizeImage(IplImage *, int, int, bool);
-IplImage *rotateImage(IplImage *, float);
-IplImage *shiftImage(IplImage *, int, int);
-IplImage *shiftImageRot(IplImage *, int, int);
-IplImage *genShiftDownsampleImage(IplImage *, int, int, int);
-void copyRegion(IplImage *, IplImage *, int, int, int, int, int, int, int, int);
+cv::Mat shiftImage(cv::Mat, int, int);
+cv::Mat shiftImageRot(cv::Mat, int, int);
+cv::Mat genShiftDownsampleImage(cv::Mat, int, int, int);
+void copyRegion(cv::Mat, cv::Mat, int, int, int, int, int, int, int, int);
