@@ -41,14 +41,14 @@ int main(int argc, char* argv[]){
     cv::imshow( "original", image );
     cv::imshow( "bigger", bigger_image );
     cv::imshow( "rotated", rotated_image );
-    cv::imshow( "shiftedRot1",	shifted_image );
-    cv::imshow( "shiftedRot2",shifted_image2 );
-    cv::imshow( "shiftedRot3",shifted_image3 );
-    cv::imshow( "shiftedRot4",shifted_image4 );
-    cv::imshow( "shifted5",	shifted_image5 );
-    cv::imshow( "shifted6",shifted_image6 );
-    cv::imshow( "shifted7",shifted_image7 );
-    cv::imshow( "shifted8",shifted_image8 );
+    cv::imshow( "1",	shifted_image );
+    cv::imshow( "2",shifted_image2 );
+    cv::imshow( "3",shifted_image3 );
+    cv::imshow( "4",shifted_image4 );
+    cv::imshow( "5",	shifted_image5 );
+    cv::imshow( "6",shifted_image6 );
+    cv::imshow( "7",shifted_image7 );
+    cv::imshow( "8",shifted_image8 );
 
     waitKey(0);
 
