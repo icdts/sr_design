@@ -1,5 +1,4 @@
 #ifdef _MSC_VER
-	//FIXME: Windows includes
 #else
 	#include <opencv/cv.h>
 	#include <opencv2/core/core.hpp>
@@ -7,4 +6,6 @@
 #endif
 #include <iostream>
 
-Mat gen_window(int, int, float, float );
+using namespace cv;
+
+Mat gen_window(int, int, float, float, int );

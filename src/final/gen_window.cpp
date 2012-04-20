@@ -1,38 +1,51 @@
 #include "gen_window.h"
+#include <vector>
 
-Mat gen_window(int s1, int s2, float d1, float d2)
+using namespace std;
+using namespace cv;
+
+Mat gen_window(int height, int width, float hpercent, float wpercent, int channels)
 {
-	//Create an s1 by 1 matrix (column matrix) filled with ones
-	Mat x = Mat::ones(s2, 1, CV_32F);
+	vector<Mat> planes;
+	Mat retVal;
+
+	//Create an height by 1 matrix (column matrix) filled with ones
+	Mat x = Mat::ones(width, 1, CV_32F);
 	//CvMat x = 
-	int steps = s2 * d2;
+	int steps = width * wpercent;
 	float slope = 0;
 	float increment = 1.0/(steps - 1);
 
-	/*Create a linear vector (row matrix) with s2*d2 evenly spaced numbers
+	/*Create a linear vector (row matrix) with width*wpercent evenly spaced numbers
 	between 0 and 1; a, b, c, etc.
 	results in array a,b,c,1,1,1,1,1,1,1,c,b,a */
 	for(int i=0; i<steps; i++){
 		x.at<float>(i, 0) = slope;
-		x.at<float>(s2 - 1 - i, 0) = slope;
+		x.at<float>(width - 1 - i, 0) = slope;
 		slope = slope + increment;
 	}
 
-	Mat y = Mat::ones(1, s1, CV_32F);
-	steps = s1 * d1;
+	Mat y = Mat::ones(1, height, CV_32F);
+	steps = height * hpercent;
 	slope = 0;
 	increment = 1.0/(steps - 1);
 
-	/*Create a linear vector (row matrix) with s1*d1 evenly spaced numbers
+	/*Create a linear vector (row matrix) with height*hpercent evenly spaced numbers
 	between 0 and 1; a, b, c, etc.
 	results in array a,b,c,1,1,1,1,1,1,1,c,b,a */
 	for(int i=0; i<steps; i++){
 		y.at<float>(0, i) = slope;
-		y.at<float>(0, s1 - 1 - i) = slope;
+		y.at<float>(0, height - 1 - i) = slope;
 		slope = slope + increment;
 	}
 
-	Mat z = Mat(s2, s1, CV_32F);
+	Mat z = Mat(width, height, CV_32F);
 	z = x * y;
-	return z;
+
+	for(int i = 0; i < channels; i++)
+		planes.push_back(z);
+
+	merge(planes, retVal);
+
+	return retVal;
 }
