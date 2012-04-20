@@ -33,8 +33,8 @@ int main(int argc, char* argv[]){
 	shifted_image2 = shiftMatRot(image,0,-25);
 	shifted_image3 = shiftMatRot(image,25,0);
 	shifted_image4 = shiftMatRot(image,-25,0);
-	shifted_image5 = shiftMat(image,0,25);
-	shifted_image6 = shiftMat(image,0,-25);
+	shifted_image5 = shiftMat(image,25,25);
+	shifted_image6 = shiftMat(image,-25,-25);
 	shifted_image7 = shiftMat(image,25,0);
 	shifted_image8 = shiftMat(image,-25,0);
 	//Show all the images

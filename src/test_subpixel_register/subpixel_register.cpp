@@ -96,6 +96,7 @@ float subpixel_register(input_image hr_input, input_image lr_input, int ds, int 
 
       
       t_mat = t_mat - lr_image;
+
       pow(t_mat, 2, t_mat);
       t_mat = -( t_mat / sigma2 );
       exp( t_mat, t_mat);
@@ -125,6 +126,9 @@ float subpixel_register(input_image hr_input, input_image lr_input, int ds, int 
     hr_input.prob += score_array[i];
   }
   hr_input.prob = hr_input.prob / 289;
+  cout << "Best score: " << hr_input.score << endl;
+  cout << "Shift: (" << hr_input.horizontal_shift << ", " << hr_input.vertical_shift << ")\n";
+  cout << "Prob: " << hr_input.prob << endl;
 
 	return hr_input.prob;
 }
