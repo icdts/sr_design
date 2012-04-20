@@ -19,7 +19,7 @@ using namespace cv;
 //This way the 'gen_shift_downsample'd image has the same size as the original
 //
 //Passing in addresses lets you return multiple values, bad practice probably
-float subpixel_register(Mat* hr_image, Mat* lr_image, int ds, int sigma); 
+float subpixel_register(input_image hr_image, input_image lr_image, int ds, int sigma); 
 
 int main(int argc, char* argv[]){
   if ( argc < 2) {
@@ -55,8 +55,8 @@ int main(int argc, char* argv[]){
 
   namedWindow ("original", CV_WINDOW_AUTOSIZE);
   namedWindow ("kron'd", CV_WINDOW_AUTOSIZE);
-  cvShowImage ("original", image);
-  cvShowImage ("kron'd", kron_image);
+  imshow ("original", image);
+  imshow ("kron'd", kron_image);
   
   waitKey(0);
 
@@ -79,7 +79,7 @@ float subpixel_register(input_image hr_image, input_image lr_image, int ds, int 
   tmp.convertTo( lr_mat, CV_64F );
   Mat t_mat   = Mat( lr_image.file.size(), CV_64F );
   Mat reduced = Mat( 1, lr_image.file.width(), CV_64F );
-  IplImage *t;
+  Mat t;
 
   int final_score = 0;
 	float score_array[289]; //used to save every score
@@ -90,7 +90,7 @@ float subpixel_register(input_image hr_image, input_image lr_image, int ds, int 
 	for(int i = -8; i<9; i++){
 		for(int j = -8; j<9; j++){
 
-			t = genShiftDownsampleImage( &(IplImage)hr_image.file , i, j, ds );
+			t = genShiftDownsampleMat( hr_image.file , i, j, ds );
       Mat temp = Mat(t);
       temp.convertTo(t_mat, CV_64F);
 
@@ -130,10 +130,9 @@ float subpixel_register(input_image hr_image, input_image lr_image, int ds, int 
   hr_image.horizontal_shift = curr_best_x;
   hr_image.vertical_shift = curr_best_y;
   for (int i=0; i<289; i++){
-    prob += score_array[i];
+    hr_image.prob += score_array[i];
     }
-  hr_image.prob = prob / 289;
+  hr_image.prob = hr_image.prob / 289;
 
-  cvReleaseImage(&t);
-	return prob;
+	return hr_image.prob;
 }
