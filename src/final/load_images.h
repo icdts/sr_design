@@ -15,7 +15,7 @@ struct input_image {
 	int vertical_shift;
 	int horizontal_shift;
 	float prob;
-	float * scores[];
+	float score;
 };
 
 std::vector<input_image> load_images(std::string dir);
