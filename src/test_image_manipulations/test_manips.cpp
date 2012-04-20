@@ -29,14 +29,14 @@ int main(int argc, char* argv[]){
 	//Transform image
 	cv::resize(image,bigger_image,Size(0,0),5,5,INTER_LINEAR);
 	cv::flip(image,rotated_image,-1);
-	shifted_image = shiftImageRot(image,0,25);
-	shifted_image2 = shiftImageRot(image,0,-25);
-	shifted_image3 = shiftImageRot(image,25,0);
-	shifted_image4 = shiftImageRot(image,-25,0);
-	shifted_image5 = shiftImageRot(image,0,25);
-	shifted_image6 = shiftImageRot(image,0,-25);
-	shifted_image7 = shiftImageRot(image,25,0);
-	shifted_image8 = shiftImageRot(image,-25,0);
+	shifted_image = shiftMatRot(image,0,25);
+	shifted_image2 = shiftMatRot(image,0,-25);
+	shifted_image3 = shiftMatRot(image,25,0);
+	shifted_image4 = shiftMatRot(image,-25,0);
+	shifted_image5 = shiftMat(image,0,25);
+	shifted_image6 = shiftMat(image,0,-25);
+	shifted_image7 = shiftMat(image,25,0);
+	shifted_image8 = shiftMat(image,-25,0);
 	//Show all the images
     cv::imshow( "original", image );
     cv::imshow( "bigger", bigger_image );
@@ -45,10 +45,10 @@ int main(int argc, char* argv[]){
     cv::imshow( "shiftedRot2",shifted_image2 );
     cv::imshow( "shiftedRot3",shifted_image3 );
     cv::imshow( "shiftedRot4",shifted_image4 );
-    cv::imshow( "shifted5",	shifted_image );
-    cv::imshow( "shifted6",shifted_image2 );
-    cv::imshow( "shifted7",shifted_image3 );
-    cv::imshow( "shifted8",shifted_image4 );
+    cv::imshow( "shifted5",	shifted_image5 );
+    cv::imshow( "shifted6",shifted_image6 );
+    cv::imshow( "shifted7",shifted_image7 );
+    cv::imshow( "shifted8",shifted_image8 );
 
     waitKey(0);
 
