@@ -1,6 +1,5 @@
 These matlab files do not have complete cpp equivalencies yet:
 
-**gen_window
 *get_images_from_files.m
 ***pocs.m
 *popupmessage.m
