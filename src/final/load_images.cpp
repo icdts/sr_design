@@ -12,23 +12,29 @@ end
 */
 #include "load_images.h"
 
-std::vector<input_image> load_images(std::string dir){
-	std::vector<input_image> files;
+using namespace std;
+using namespace cv;
 
+vector<input_image> load_images(string dir){
+	vector<input_image> files;
+	Mat tmp;
 	DIR *dp;
+
 	struct dirent *dirp;
 	if((dp = opendir(dir.c_str())) == NULL) {
-		std::cout << "Error(" << errno << ") opening " << dir << std::endl;
+		cout << "Error(" << errno << ") opening " << dir << endl;
 		exit(errno);
 	}
 
 	while ((dirp = readdir(dp)) != NULL) {
-		if( std::string(dirp->d_name) != "." && std::string(dirp->d_name) != ".."){
+		if( string(dirp->d_name) != "." && string(dirp->d_name) != ".."){
 			input_image f;
-			f.name = dir + std::string(dirp->d_name);
+			f.name = dir + string(dirp->d_name);
 
-			f.file = cv::imread(f.name.c_str(), CV_LOAD_IMAGE_COLOR);
-			f.name = std::string(dirp->d_name);
+			tmp = imread(f.name.c_str(), CV_LOAD_IMAGE_COLOR);
+			tmp.convertTo(f.file,CV_32F);
+
+			f.name = string(dirp->d_name);
 
 			files.push_back(f);
 		}
