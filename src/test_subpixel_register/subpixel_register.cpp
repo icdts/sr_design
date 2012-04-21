@@ -1,5 +1,6 @@
 #include "../final/image_manipulations.h"
 #include "../final/load_images.h"
+#include "subpixel_register.h"
 #include <opencv/cv.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -19,7 +20,6 @@ using namespace cv;
 //This way the 'gen_shift_downsample'd image has the same size as the original
 //
 //Passing in addresses lets you return multiple values, bad practice probably
-float subpixel_register(input_image hr_image, input_image lr_image, int ds, int sigma); 
 
 int main(int argc, char* argv[]){
   if ( argc < 2) {
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]){
   Mat image = imread( argv[1] );
   Mat kron_image;
   resize(image, kron_image, Size(), 4, 4, CV_INTER_AREA);
-  kron_image = shiftMat(kron_image, -7, 6); 
+  kron_image = shiftMat(kron_image, 8, 8); 
 
   input_image original;
   original.name = "Original";
@@ -50,19 +50,24 @@ int main(int argc, char* argv[]){
   krond.score = 0;
   krond.prob = 0;
 
-  float prob = subpixel_register(krond, original, 4, -1);
+  float prob = subpixel_register(&krond, &original, 4, -1);
 
   namedWindow ("original", CV_WINDOW_AUTOSIZE);
   namedWindow ("kron'd", CV_WINDOW_AUTOSIZE);
   imshow ("original", original.file);
   imshow ("kron'd", krond.file);
+ 
+  krond.prob = krond.prob / 289;
+  cout << "Best score: " << krond.score << endl;
+  cout << "Shift: (" << krond.horizontal_shift << ", " << krond.vertical_shift << ")\n";
+  cout << "Prob: " << krond.prob << endl; 
   
   waitKey(0);
 
   return 0;
 }
 
-float subpixel_register(input_image hr_input, input_image lr_input, int ds, int sigma)
+float subpixel_register(input_image *hr_input, input_image *lr_input, int ds, int sigma)
 {
   if (sigma < 0)
     sigma = 40;
@@ -72,8 +77,8 @@ float subpixel_register(input_image hr_input, input_image lr_input, int ds, int 
 	float sigma2 = 2 * sigma * sigma; //2*40*40, don't know why
       
   Mat lr_image, hr_image;
-  lr_input.file.copyTo(lr_image);//create a copy of the matrix contained in the struct
-  hr_input.file.copyTo(hr_image);//create a copy...
+  lr_input->file.copyTo(lr_image);//create a copy of the matrix contained in the struct
+  hr_input->file.copyTo(hr_image);//create a copy...
 
   lr_image.convertTo( lr_image, CV_64F );//convert to 64F so exp and reduce work correctly
   Mat t_mat;
@@ -111,10 +116,10 @@ float subpixel_register(input_image hr_input, input_image lr_input, int ds, int 
       //    score(sid)=prod(prod(exp(-(t-lr_image).^2/(2*sigma*sigma))));
       score_array[sid] =  final_score;
       sid += 1;
-      if (final_score > hr_input.score){
-        hr_input.score = final_score;
-        hr_input.horizontal_shift = i; 
-        hr_input.vertical_shift = j;
+      if (final_score > hr_input->score){
+        hr_input->score = final_score;
+        hr_input->horizontal_shift = i; 
+        hr_input->vertical_shift = j;
       }
 
       final_score = 0;
@@ -123,12 +128,8 @@ float subpixel_register(input_image hr_input, input_image lr_input, int ds, int 
 	}
 
   for (int i=0; i<289; i++){
-    hr_input.prob += score_array[i];
+    hr_input->prob += score_array[i];
   }
-  hr_input.prob = hr_input.prob / 289;
-  cout << "Best score: " << hr_input.score << endl;
-  cout << "Shift: (" << hr_input.horizontal_shift << ", " << hr_input.vertical_shift << ")\n";
-  cout << "Prob: " << hr_input.prob << endl;
 
-	return hr_input.prob;
+	return hr_input->prob;
 }
