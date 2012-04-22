@@ -4,7 +4,5 @@
 #include <cmath>
 #include "../final/gen_window.h"
 #include "../final/image_manipulations.h"
-
-#define DEBUG
-
+#include "../final/debug.h"
 cv::Mat register_image(cv::Mat, cv::Mat);

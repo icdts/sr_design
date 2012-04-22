@@ -1,15 +1,7 @@
 #include "register_image.h"
 
-#define DEBUG
-
 using namespace std;
 using namespace cv;
-
-void debug(string str){
-#ifdef DEBUG
-    cerr << "DEBUG: " << str << endl;
-#endif
-}
 
 int main(int argc, char const *argv[]){
 	debug("Reading Images");

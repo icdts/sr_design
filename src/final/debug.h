@@ -1,5 +1,5 @@
 #include <iostream>
 #include <string>
 
-#define debug
+#define DEBUG 
 void debug(string);
