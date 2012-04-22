@@ -1,17 +1,20 @@
 These matlab files do not have complete cpp equivalencies yet:
 
-*get_images_from_files.m
-***pocs.m
-*popupmessage.m
 reg_gui.m
 register_color_image.m
+<<<<<<< HEAD
 **register_image.m
 sr_bw.m
 sr_gui.m
 sr_one_step.m
 **sr_one_step_wb.m
-**subpixel_register.m
+subpixel_register.m
+=======
+**Robbie : register_image.m
+*sr_bw.m
+**Mitch : sr_gui.m
+**Casey : sr_one_step_wb.m
+>>>>>>> 15fa0277f1181d2244f86918dd577da4de9d54d8
 
-*trivial
-**in progress
-***needs testing
+*  trivial
+** in progress

@@ -1,16 +1,30 @@
 #include "register_image.h"
 
+#define DEBUG
+
+using namespace std;
+using namespace cv;
+
+void debug(string str){
+#ifdef DEBUG
+    cerr << "DEBUG: " << str << endl;
+#endif
+}
+
 int main(int argc, char const *argv[]){
-	cv::Mat im = cv::imread(argv[1]);
-	cv::Mat im2 = cv::imread(argv[2]);
+	debug("Reading Images");
+	Mat im = imread(argv[1]);
+	Mat im2 = imread(argv[2]);
 
-	cv::Mat result = register_image(im,im2);
+	debug("Calling register_image");
+	Mat result = register_image(im,im2);
 
-	cv::imshow("im",im);
-	cv::imshow("im2",im2);
-	cv::imshow("result",result);
+	debug("Showing output");
+	imshow("im",im);
+	imshow("im2",im2);
+	imshow("result",result);
 
-	cv::waitKey(0);
+	waitKey(0);
 
 	return 0;
 }

@@ -30,67 +30,18 @@ sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
 %this is still somewhat unclear
 im2_reg=shift_image(oim2,sh);
 */
-cv::Mat register_image(cv::Mat input1, cv::Mat input2){
-    cv::Mat im1;
-    cv::Mat im2;
-    cv::Mat window;
-    cv::Mat flipped_im2;
-    cv::Mat tmp1;
-    cv::Mat tmp2;
-    CvPoint max;
 
-    int x;
-    int y;
+using namespace std;
+using namespace cv;
 
-    int shid;
-
-    //Deep copies to keep from changing original
-    input1.copyTo(im1);
-    input2.copyTo(im2);
-
-    //Mitigate boundary effect
-    window = gen_window(im1.rows,im1.cols,0.05,0.05,im1.channels());
-    im1 = window.mul(im1);
-    im2 = window.mul(im2);
-
-    //Normalize result
-    im1 = im1.mul(1/im1.mean());
-    im2 = im2.mul(1/im2.mean());
-
-    //Flip left-right and up-down
-    cv::flip(im2,flipped_im2,-1);
-
-    //First fft2
-    dft(im1,tmp1,DFT_COMPLEX_OUTPUT);
-
-    //Second fft2
-    dft(flipped_im2,tmp2,DFT_COMPLEX_OUTPUT);
-
-    //Multiply on element-by-element basis
-    tmp1 = tmp1.mul(tmp2);
-
-    //Reverse fft
-    idft(tmp1,tmp2,DFT_COMPLEX_OUTPUT);
-
-    //Shift zero frequencies to the middle
-    tmp2 = fftshift(abs(tmp2));
-
-    //Find maximum element
-    minMaxLoc(tmp2,NULL,NULL,NULL,&max);
-
-    //replicating Matlab, no good explination
-    shid = (max.x * tmp2.rows) + max.y;
-
-    //%make a point based on the middle of the image
-    //sh(1)=(mod(shid-1,size(im1,1))+1)-size(im1,1)/2;
-    //sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
-    x = (((shid-1)%im1.rows) + 1) - (im1.rows/2);
-    y = Math.ceil((shid-1)/im1.rows) - (im1.rows/2);
-
-    return shiftImage(input2,x,y);   
+void debug(string str){
+#ifdef DEBUG
+    cerr << "DEBUG: " << str << endl;
+#endif
 }
-cv::Mat fftshift(const cv::Mat & input){
-    cv::Mat output = input.clone();
+
+Mat fftshift(Mat& input){
+    Mat output = input.clone();
     int half_x = input.rows / 2;
     int half_y = input.cols / 2;
     int new_i, new_j;
@@ -102,4 +53,82 @@ cv::Mat fftshift(const cv::Mat & input){
         }
     }
     return output;
+}
+
+Mat register_image(Mat input1, Mat input2){
+    Mat im1;
+    Mat im2;
+    Mat window;
+    Mat flipped_im2;
+    Mat tmp1;
+    Mat tmp2;
+    Point max;
+
+    Scalar scalar;
+    int x;
+    int y;
+
+    int shid;
+
+    debug("Deep Copying");
+    //Deep copies to keep from changing original
+    input1.copyTo(im1);
+    input2.copyTo(im2);
+
+    debug("Mitigating Boundary Effect");
+    //Mitigate boundary effect
+    window = gen_window(im1.rows,im1.cols,0.05,0.05,im1.channels());
+    im1 = window.mul(im1);
+    im2 = window.mul(im2);
+
+    debug("Fake Normalizing");
+    //Normalize result
+    scalar = mean(im1);
+    im1.copyTo(tmp1);
+    im2.copyTo(tmp2);
+    tmp1.setTo(mean(im1));
+    tmp2.setTo(mean(im2));
+    divide(im1,tmp1,im1,1);
+    divide(im2,tmp2,im2,1);
+
+    debug("Flipping im2");
+    //Flip left-right and up-down
+    flip(im2,flipped_im2,-1);
+
+    debug("FFT calls");
+    //First fft2
+    dft(im1,tmp1,DFT_COMPLEX_OUTPUT);
+
+    //Second fft2
+    dft(flipped_im2,tmp2,DFT_COMPLEX_OUTPUT);
+
+    //Multiply on element-by-element basis
+    tmp1 = tmp1.mul(tmp2);
+
+    debug("Reverse FFT");
+    //Reverse fft
+    idft(tmp1,tmp2,DFT_COMPLEX_OUTPUT);
+
+    debug("Abs of result");
+    //Shift zero frequencies to the middle
+    tmp2 = abs(tmp2);
+    debug("FFTSHIFT");
+    tmp2 = fftshift(tmp2);
+
+    debug("Finding max loc");
+    //Find maximum element
+    minMaxLoc(tmp2,NULL,NULL,NULL,&max);
+
+    debug("Crazy Maths");
+    //replicating Matlab, no good explination
+    shid = (max.x * tmp2.rows) + max.y;
+
+    //%make a point based on the middle of the image
+    //sh(1)=(mod(shid-1,size(im1,1))+1)-size(im1,1)/2;
+    //sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
+    x = (((shid-1)%im1.rows) + 1) - (im1.rows/2);
+    y = ceil((shid-1)/im1.rows) - (im1.rows/2);
+
+    debug("Returning shifted img");
+    return shiftMat(input2,x,y);   
 }

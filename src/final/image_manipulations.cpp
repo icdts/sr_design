@@ -171,11 +171,11 @@ Mat genShiftDownsampleMat(Mat src, int up_down, int left_right, int downsample_r
   Mat gsds_image;
   int del_width = src.cols % downsample_ratio;
   int del_height = src.rows % downsample_ratio;
-	  
+
 	gsds_image = Mat(src, Range(0, src.cols-del_width), Range(0, src.rows-del_height) );
 
   gsds_image = shiftMat( gsds_image, up_down, left_right);
-  resize(src, gsds_image, Size(), 1/downsample_ratio, 1/downsample_ratio,INTER_LINEAR);
+  resize(gsds_image, gsds_image, Size(), float(1)/float(downsample_ratio), float(1)/float(downsample_ratio),INTER_LINEAR);
 
 	return gsds_image;
 }
