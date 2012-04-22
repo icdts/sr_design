@@ -13,13 +13,13 @@ using namespace cv;
 #define height() rows
 #define width() cols
 
-//When values are passed in hr_image should be the original image kroned with ds 1
+// When values are passed in hr_image should be the original image kroned with ds 1
 //    i.e. should be the image with each pixel expanded to fill 4 times the space
 //
-//lr_image is the origianl image beign worked on
-//This way the 'gen_shift_downsample'd image has the same size as the original
+// lr_image is the origianl image beign worked on
+// This way the 'gen_shift_downsample'd image has the same size as the original
 //
-//Passing in addresses lets you return multiple values, bad practice probably
+// Passing in addresses lets you return multiple values, bad practice probably
 
 int main(int argc, char* argv[]){
   if ( argc < 2) {
@@ -72,8 +72,7 @@ float subpixel_register(input_image *hr_input, input_image *lr_input, int ds, in
   if (sigma < 0)
     sigma = 40;
 
-	int sid = 0;
-
+	int sid = 0; //iterator for the score array
 	float sigma2 = 2 * sigma * sigma; //2*40*40, don't know why
       
   Mat lr_image, hr_image;
@@ -82,13 +81,17 @@ float subpixel_register(input_image *hr_input, input_image *lr_input, int ds, in
 
   lr_image.convertTo( lr_image, CV_64F );//convert to 64F so exp and reduce work correctly
   Mat t_mat;
-  Mat reduced = Mat( 1, lr_image.width(), CV_64F );//a 1 by width array to store column averages
+  Mat reduced = Mat( 1, lr_image.width(), CV_64F );//a (1 x width) array to store column averages
 
   int final_score = 0;
 	float score_array[289]; //used to save every score
 
 	for(int i = -8; i<9; i++){
 		for(int j = -8; j<9; j++){
+      // these loops shift the image in every possible combination
+      // from (-8,-8) to (8,8) and determines a score based on some
+      // code from the matlab implementation, the score is usually a
+      // number in the thousands
 
       if ( ( hr_image.width()) / 4  !=   lr_image.width() ){
         cout <<" Troubles: the two images are not the right size, sorry)" << endl;
@@ -97,13 +100,21 @@ float subpixel_register(input_image *hr_input, input_image *lr_input, int ds, in
       }
 			
       Mat t = genShiftDownsampleMat( hr_image, i, j, ds );
-      t.convertTo(t_mat, CV_64F);
+      //shift the kronned image and downsample it so it's the same size as lr
+      t.convertTo(t_mat, CV_64F); //convert to a 64F matrix and store in t_mat
 
-      
-      t_mat = t_mat - lr_image;
-
-      pow(t_mat, 2, t_mat);
-      t_mat = -( t_mat / sigma2 );
+      // I do not know this math, it came from the MATLAB code: 
+      //  score(sid)=prod(
+      //                  prod(
+      //                        exp(
+      //                            -(t-lr_image).^2 
+      //                            /(2*sigma*sigma)
+      //                            )
+      //                        )
+      //                )
+      t_mat = t_mat - lr_image;                 
+      pow(t_mat, 2, t_mat);                     
+      t_mat = -( t_mat / sigma2 ); // sigma2 = 2*sigma*sigma        
       exp( t_mat, t_mat);
       reduce(t_mat, reduced, 0, CV_REDUCE_AVG);
       reduced = reduced * lr_image.height();
@@ -111,25 +122,26 @@ float subpixel_register(input_image *hr_input, input_image *lr_input, int ds, in
       final_score = final_score * lr_image.width();
       cout << "Score for " << i << ", " << j << " is: " << final_score << endl;
 
-
-      // Who knows why, but just copy these maths
-      //    score(sid)=prod(prod(exp(-(t-lr_image).^2/(2*sigma*sigma))));
-      score_array[sid] =  final_score;
+      score_array[sid] =  final_score; //store the resulting score in the array
       sid += 1;
       if (final_score > hr_input->score){
+        // if the new score is better put a new best in the passed image
+        // since it was passed by reference this changes the input_image
+        // struct in the above function as well
         hr_input->score = final_score;
         hr_input->horizontal_shift = i; 
         hr_input->vertical_shift = j;
       }
 
-      final_score = 0;
-			//if score is highest, set temp_sh[] to be those i and j values
-		}
+      final_score = 0; //reset score
+      }
 	}
 
+  //determine probability by dividing best score by sum of scores
   for (int i=0; i<289; i++){
     hr_input->prob += score_array[i];
   }
+  hr_input->prob = hr_input->score / hr_input->prob;
 
 	return hr_input->prob;
 }
