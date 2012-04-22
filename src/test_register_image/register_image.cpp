@@ -34,12 +34,6 @@ im2_reg=shift_image(oim2,sh);
 using namespace std;
 using namespace cv;
 
-void debug(string str){
-#ifdef DEBUG
-    cerr << "DEBUG: " << str << endl;
-#endif
-}
-
 Mat fftshift(Mat& input){
     Mat output = input.clone();
     int half_x = input.rows / 2;
@@ -49,13 +43,14 @@ Mat fftshift(Mat& input){
         for(int j=0; j<input.cols; j++){
             new_i = (i + half_x) % input.rows;
             new_j = (j + half_y) % input.cols;
-            output.at<uchar>(new_i,new_j) = input.at<uchar>(i,j);
+            output.at<float>(new_i,new_j) = input.at<float>(i,j);
         }
     }
     return output;
 }
 
 Mat register_image(Mat input1, Mat input2){
+    Mat mask;
     Mat im1;
     Mat im2;
     Mat window;
@@ -63,6 +58,7 @@ Mat register_image(Mat input1, Mat input2){
     Mat tmp1;
     Mat tmp2;
     Point max;
+    Point min;
 
     Scalar scalar;
     int x;
@@ -70,14 +66,20 @@ Mat register_image(Mat input1, Mat input2){
 
     int shid;
 
+    if(!(im1.channels() == 1 && im2.channels() == 1)){
+        cerr << "Passed wrong image type to register_image:" << input1.channels() << ", " << input2.channels() << endl;
+        exit(1);
+    }
+
     debug("Deep Copying");
     //Deep copies to keep from changing original
     input1.copyTo(im1);
     input2.copyTo(im2);
 
     debug("Mitigating Boundary Effect");
-    //Mitigate boundary effect
     window = gen_window(im1.rows,im1.cols,0.05,0.05,im1.channels());
+
+    debug("Got window back");
     im1 = window.mul(im1);
     im2 = window.mul(im2);
 
@@ -105,19 +107,24 @@ Mat register_image(Mat input1, Mat input2){
     //Multiply on element-by-element basis
     tmp1 = tmp1.mul(tmp2);
 
-    debug("Reverse FFT");
+    /*
+    f=fftshift(abs(ifft2(tmp))); %fftshift moves fft so zero frequency 
+                                 %component is in middle, ifft2 inverse fft    debug("Reverse FFT");
+    */
     //Reverse fft
-    idft(tmp1,tmp2,DFT_COMPLEX_OUTPUT);
+    idft(tmp1,tmp2,DFT_REAL_OUTPUT);
 
     debug("Abs of result");
     //Shift zero frequencies to the middle
     tmp2 = abs(tmp2);
+
     debug("FFTSHIFT");
     tmp2 = fftshift(tmp2);
 
     debug("Finding max loc");
     //Find maximum element
-    minMaxLoc(tmp2,NULL,NULL,NULL,&max);
+    //void minMaxLoc(const SparseMat& src, double* minVal, double* maxVal, int* minIdx=0, int* maxIdx=0)
+    minMaxLoc(tmp2, NULL, NULL, NULL, &max, Mat::ones(tmp2.rows, tmp2.cols, CV_8UC1 ) );
 
     debug("Crazy Maths");
     //replicating Matlab, no good explination

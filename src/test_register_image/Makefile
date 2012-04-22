@@ -1,8 +1,8 @@
 OPENCV_INCS=`pkg-config --cflags --libs opencv`
 IM_LOC=../final/
 
-test: test.o register_image.o image_manipulations.o gen_window.o
-	g++ -o test test.o register_image.o image_manipulations.o gen_window.o $(OPENCV_INCS)
+test: test.o register_image.o image_manipulations.o gen_window.o debug.o
+	g++ -o test test.o register_image.o image_manipulations.o gen_window.o debug.o $(OPENCV_INCS)
 
 test.o: test.cpp register_image.h
 	g++ -c test.cpp $(OPENCV_INCS)
