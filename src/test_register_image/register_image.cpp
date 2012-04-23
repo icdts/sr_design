@@ -34,6 +34,28 @@ im2_reg=shift_image(oim2,sh);
 using namespace std;
 using namespace cv;
 
+void adjustments(Mat& im1, Mat& im2){
+    Mat window;
+    Mat im1_mean;
+    Mat im2_mean;
+
+    debug("Mitigating Boundary Effect");
+    window = gen_window(im1.rows,im1.cols,0.05,0.05,im1.channels());
+
+    debug("Got window back");
+    im1 = window.mul(im1);
+    im2 = window.mul(im2);
+
+    debug("Fake Normalizing");
+    //Normalize result
+    im1.copyTo(im1_mean);
+    im2.copyTo(im2_mean);
+    im1_mean.setTo(mean(im1));
+    im2_mean.setTo(mean(im2));
+    divide(im1,im1_mean,im1,1);
+    divide(im2,im2_mean,im2,1);
+}
+
 Mat fftshift(Mat& input){
     Mat output;
     int half_x;
@@ -104,61 +126,29 @@ Mat register_image(Mat input1, Mat input2){
     input1.copyTo(im1);
     input2.copyTo(im2);
 
-    if(im1.channels() == 1 && im2.channels() == 1){
-        Mat window;
-        Mat im1_mean;
-        Mat im2_mean;
+    //TODO:  Test to see if one channel images can be done this way?
+        //Not sure what all the windowing and dividing accomplishes.
+    vector<Mat> channels_im1;
+    vector<Mat> channels_im2;
 
-        debug("Mitigating Boundary Effect");
-        window = gen_window(im1.rows,im1.cols,0.05,0.05,im1.channels());
+    split(im1,channels_im1);
+    split(im2,channels_im2);
+    fft_return = Mat::zeros(im1.rows,im1.cols,CV_32FC1);
 
-        debug("Got window back");
-        im1 = window.mul(im1);
-        im2 = window.mul(im2);
+    for(int i = 0; i < channels_im1.size(); i++){
+        adjustments(channels_im1[i],channels_im2[i]);
 
-        debug("Fake Normalizing");
-        //Normalize result
-        im1.copyTo(im1_mean);
-        im2.copyTo(im2_mean);
-        im1_mean.setTo(mean(im1));
-        im2_mean.setTo(mean(im2));
-        divide(im1,im1_mean,im1,1);
-        divide(im2,im2_mean,im2,1);
-
-        debug("Do fft transforms");
-        im2_mean = fft_math(im1,im2);
-
-        debug("Returning shifted img");
-        fft_return = fft_math(im1,im2);
-    }else if(im1.channels() == 3 && im2.channels() == 3){
-        //TODO:  Test to see if one channel images can be done this way?
-            //Not sure what all the windowing and dividing accomplishes.
-        vector<Mat> channels_im1;
-        vector<Mat> channels_im2;
-
-        split(im1,channels_im1);
-        split(im2,channels_im2);
-        fft_return = Mat::zeros(im1.rows,im1.cols,CV_32FC1);
-
-        for(int i = 0; i < channels_im1.size(); i++){
-            fft_return = fft_return + fft_math(channels_im1[i],channels_im2[i]);
-        }
-    }else{
-        cerr << "Passed wrong image type to register_image:" 
-            << input1.channels() 
-            << ", " 
-            << input2.channels() << endl;
-        exit(1);
+        fft_return = fft_return + fft_math(channels_im1[i],channels_im2[i]);
     }
-    debug("Finding max loc");
+
     //Find maximum element
+    debug("Finding max loc");
     minMaxLoc(
         fft_return, 
         NULL, NULL, NULL, //Don't want the max/min value or min location
         &max, //Want the maximum location
         Mat::ones(fft_return.rows, fft_return.cols, CV_8UC1) //No masking eles
     );
-
     //Shift based on that maximum
     cerr << "MAX: " << max.x << "," << max.y << endl;
     x = max.y - (im1.rows/2);
