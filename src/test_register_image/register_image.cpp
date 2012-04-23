@@ -159,15 +159,11 @@ Mat register_image(Mat input1, Mat input2){
         Mat::ones(fft_return.rows, fft_return.cols, CV_8UC1) //No masking eles
     );
 
-    debug("Crazy Maths");
-    //replicating Matlab, no good explination
-    shid = (max.x * fft_return.rows) + max.y;
-
-    //%make a point based on the middle of the image
-    //sh(1)=(mod(shid-1,size(im1,1))+1)-size(im1,1)/2;
-    //sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
-    x = (((shid-1)%im1.rows) + 1) - (im1.rows/2);
-    y = ceil((shid-1)/im1.rows) - (im1.cols/2);
+    //Shift based on that maximum
+    cerr << "MAX: " << max.x << "," << max.y << endl;
+    x = max.y - (im1.rows/2);
+    y = max.x - (im1.cols/2);
+    cerr << "SHIFT: " << x << ", " << y << endl;
 
     return shiftMat(input2,x,y);   
 }

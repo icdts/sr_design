@@ -35,9 +35,16 @@ int main(int argc, char const *argv[]){
 		cim2 = shiftMat(cim2,shifts[i][0],shifts[i][1]);
 
 		debug("Calling register_image");
-		result = register_image(im1,im2);
-		cresult = register_image(cim1,cim2);
 
+		debug("REGISTER BW");
+		result = register_image(im1,im2);
+		debug("");
+		debug("");
+		debug("REGISTER COLOR");
+		cresult = register_image(cim1,cim2);
+		debug("");
+		debug("");
+		
 		im1.convertTo(im1,CV_8U);
 		im2.convertTo(im2,CV_8U);
 		cim1.convertTo(cim1,CV_8U);
