@@ -30,36 +30,74 @@ sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
 %this is still somewhat unclear
 im2_reg=shift_image(oim2,sh);
 */
-cv::Mat register_image(cv::Mat input1, cv::Mat input2){
-    cv::Mat im1;
-    cv::Mat im2;
-    cv::Mat window;
-    cv::Mat flipped_im2;
-    cv::Mat tmp1;
-    cv::Mat tmp2;
-    CvPoint max;
 
+using namespace std;
+using namespace cv;
+
+Mat fftshift(Mat& input){
+    Mat output = input.clone();
+    int half_x = input.rows / 2;
+    int half_y = input.cols / 2;
+    int new_i, new_j;
+    for(int i=0; i<input.rows; i++){
+        for(int j=0; j<input.cols; j++){
+            new_i = (i + half_x) % input.rows;
+            new_j = (j + half_y) % input.cols;
+            output.at<float>(new_i,new_j) = input.at<float>(i,j);
+        }
+    }
+    return output;
+}
+
+Mat register_image(Mat input1, Mat input2){
+    Mat mask;
+    Mat im1;
+    Mat im2;
+    Mat window;
+    Mat flipped_im2;
+    Mat tmp1;
+    Mat tmp2;
+    Point max;
+    Point min;
+
+    Scalar scalar;
     int x;
     int y;
 
     int shid;
 
+    if(!(im1.channels() == 1 && im2.channels() == 1)){
+        cerr << "Passed wrong image type to register_image:" << input1.channels() << ", " << input2.channels() << endl;
+        exit(1);
+    }
+
+    debug("Deep Copying");
     //Deep copies to keep from changing original
     input1.copyTo(im1);
     input2.copyTo(im2);
 
-    //Mitigate boundary effect
+    debug("Mitigating Boundary Effect");
     window = gen_window(im1.rows,im1.cols,0.05,0.05,im1.channels());
+
+    debug("Got window back");
     im1 = window.mul(im1);
     im2 = window.mul(im2);
 
+    debug("Fake Normalizing");
     //Normalize result
-    im1 = im1.mul(1/im1.mean());
-    im2 = im2.mul(1/im2.mean());
+    scalar = mean(im1);
+    im1.copyTo(tmp1);
+    im2.copyTo(tmp2);
+    tmp1.setTo(mean(im1));
+    tmp2.setTo(mean(im2));
+    divide(im1,tmp1,im1,1);
+    divide(im2,tmp2,im2,1);
 
+    debug("Flipping im2");
     //Flip left-right and up-down
-    cv::flip(im2,flipped_im2,-1);
+    flip(im2,flipped_im2,-1);
 
+    debug("FFT calls");
     //First fft2
     dft(im1,tmp1,DFT_COMPLEX_OUTPUT);
 
@@ -69,15 +107,26 @@ cv::Mat register_image(cv::Mat input1, cv::Mat input2){
     //Multiply on element-by-element basis
     tmp1 = tmp1.mul(tmp2);
 
+    /*
+    f=fftshift(abs(ifft2(tmp))); %fftshift moves fft so zero frequency 
+                                 %component is in middle, ifft2 inverse fft    debug("Reverse FFT");
+    */
     //Reverse fft
-    idft(tmp1,tmp2,DFT_COMPLEX_OUTPUT);
+    idft(tmp1,tmp2,DFT_REAL_OUTPUT);
 
+    debug("Abs of result");
     //Shift zero frequencies to the middle
-    tmp2 = fftshift(abs(tmp2));
+    tmp2 = abs(tmp2);
 
+    debug("FFTSHIFT");
+    tmp2 = fftshift(tmp2);
+
+    debug("Finding max loc");
     //Find maximum element
-    minMaxLoc(tmp2,NULL,NULL,NULL,&max);
+    //void minMaxLoc(const SparseMat& src, double* minVal, double* maxVal, int* minIdx=0, int* maxIdx=0)
+    minMaxLoc(tmp2, NULL, NULL, NULL, &max, Mat::ones(tmp2.rows, tmp2.cols, CV_8UC1 ) );
 
+    debug("Crazy Maths");
     //replicating Matlab, no good explination
     shid = (max.x * tmp2.rows) + max.y;
 
@@ -85,21 +134,8 @@ cv::Mat register_image(cv::Mat input1, cv::Mat input2){
     //sh(1)=(mod(shid-1,size(im1,1))+1)-size(im1,1)/2;
     //sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
     x = (((shid-1)%im1.rows) + 1) - (im1.rows/2);
-    y = Math.ceil((shid-1)/im1.rows) - (im1.rows/2);
+    y = ceil((shid-1)/im1.rows) - (im1.rows/2);
 
-    return shiftImage(input2,x,y);   
-}
-cv::Mat fftshift(const cv::Mat & input){
-    cv::Mat output = input.clone();
-    int half_x = input.rows / 2;
-    int half_y = input.cols / 2;
-    int new_i, new_j;
-    for(int i=0; i<input.rows; i++){
-        for(int j=0; j<input.cols; j++){
-            new_i = (i + half_x) % input.rows;
-            new_j = (j + half_y) % input.cols;
-            output.at<uchar>(new_i,new_j) = input.at<uchar>(i,j);
-        }
-    }
-    return output;
+    debug("Returning shifted img");
+    return shiftMat(input2,x,y);   
 }
