@@ -1,21 +1,23 @@
-/*
-%This just gets images from a file, nothing else and will be totally
-%different when we have to implement it:
-function files=get_images_from_files(prefix, suffix, frange);
-
-id=1;
-for imid=frange
-    files{id}=imread(sprintf('%s%d.%s',prefix,imid,suffix));
-    id=id+1;
-    imid
-end
-*/
 #include "load_images.h"
 
 using namespace std;
 using namespace cv;
 
-vector<input_image> load_images(string dir){
+
+/******************************************************************************
+
+	load_images accepts the string of a directory as a parameter.  It then 
+	loads all of the images of that directory into a Mat element in  an 
+	input_images object. The input_image is also loaded with the name of the 
+	image and is then added to a vector with all of the other images from the
+	directory.  This vector is then returned.
+
+	load_images:
+		string dir:
+			The directory within which all of the input images are contained.
+
+******************************************************************************/
+vector<input_image> load_images( string dir ){
 	vector<input_image> files;
 	Mat tmp;
 	DIR *dp;
@@ -44,4 +46,3 @@ vector<input_image> load_images(string dir){
 
 	return files;
 }
-
