@@ -97,7 +97,7 @@ Mat sr_one_step_wb(input_image &src, vector <input_image> &input){
 		cout << "seventh" << endl;
 		//if the probability for the input image is high, add the shift to the output
 		if (input[tid].prob > 0.9){
-			//sh_image=shiftMat(kron_image, -input[tid].vertical_shift, -input[tid].horizontal_shift);
+			sh_image=shiftMat(kron_image, -input[tid].vertical_shift, -input[tid].horizontal_shift);
 			image += sh_image;
 		}
 	}
