@@ -25,38 +25,43 @@ int main(int argc, char* argv[]){
     cout << "Usage: functioncall ImagetoUse" << endl;
     return -1;
     }*/
-/*	cout << "first" << endl;
 int rescale_factor = 4;
 input_image image;
 input_image curr;
-cout << "second" << endl;
 vector <input_image> input;
 curr.file = imread("1.jpg");
-//imshow("pop", curr.file);
+imshow("pop", curr.file);
 resize(curr.file, curr.file, Size(), 4, 4, CV_INTER_AREA);
+curr.file = shiftMat(curr.file, -3, 4);
 input.push_back(curr);
 curr.file = imread("1.jpg");
 resize(curr.file, curr.file, Size(), 4, 4, CV_INTER_AREA);
+curr.file = shiftMat(curr.file, -6, 0);
 input.push_back(curr);
 curr.file = imread("1.jpg");
 resize(curr.file, curr.file, Size(), 4, 4, CV_INTER_AREA);
+curr.file = shiftMat(curr.file, 3, 4);
 input.push_back(curr);
 curr.file = imread("1.jpg");
 resize(curr.file, curr.file, Size(), 4, 4, CV_INTER_AREA);
+curr.file = shiftMat(curr.file, 0, -4);
 input.push_back(curr);
 curr.file = imread("1.jpg");
 resize(curr.file, curr.file, Size(), 4, 4, CV_INTER_AREA);
+curr.file = shiftMat(curr.file, 5, -2);
 input.push_back(curr);
 cout << "third" << endl;
 image.file = imread("1.jpg");
-*/
+
+
 Mat kron_image;
 //resize(image.file, image.file, Size(), 4, 4, CV_INTER_AREA);
 
 Mat output = sr_one_step_wb(image, input);
 cout << "working" << endl;
 for(int i = 0; i<input.size(); i++){
-	cout << "horizontal shift: " << input[i].horizontal_shift << endl;
+	cout << "horizontal shift: " << input[i].horizontal_shift;
+	cout << ", vertical shift: " << input[i].vertical_shift << endl;
 }
 
 system("pause");

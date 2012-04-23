@@ -21,7 +21,7 @@ using namespace cv;
 //
 // Passing in addresses lets you return multiple values, bad practice probably
 
-int main(int argc, char* argv[]){
+/*int main(int argc, char* argv[]){
   if ( argc < 2) {
     cout << "Usage: functioncall ImagetoUse" << endl;
     return -1;
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]){
   waitKey(0);
 
   return 0;
-}
+}*/
 
 float subpixel_register(input_image *hr_input, input_image *lr_input, int ds, int sigma)
 {
@@ -120,7 +120,7 @@ float subpixel_register(input_image *hr_input, input_image *lr_input, int ds, in
       reduced = reduced * lr_image.height();
       final_score = mean(reduced)[0];
       final_score = final_score * lr_image.width();
-      cout << "Score for " << i << ", " << j << " is: " << final_score << endl;
+      //cout << "Score for " << i << ", " << j << " is: " << final_score << endl;
 
       score_array[sid] =  final_score; //store the resulting score in the array
       sid += 1;
