@@ -6,11 +6,11 @@ using namespace cv;
 
 int main(int argc, char const *argv[]){
 	debug("Reading Images");
-	Mat im1 = imread(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
-	Mat im2 = imread(argv[2],CV_LOAD_IMAGE_GRAYSCALE);
+	Mat im1 = imread(argv[1]);
+	Mat im2 = imread(argv[2]);
 
-	im1.convertTo(im1,CV_32FC1);
-	im2.convertTo(im2,CV_32FC1);
+	im1.convertTo(im1,CV_32FC3);
+	im2.convertTo(im2,CV_32FC3);
 
 	im2 = shiftMat(im2,15,0);
 	imshow("im2",im2);
