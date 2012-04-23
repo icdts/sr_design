@@ -26,7 +26,7 @@ using namespace cv;
 ******************************************************************************/
 Mat shiftMat(	Mat input, 
 				int vertical, 
-				int horizontally ){
+				int horizontal ){
 	Mat src;
 	Mat image_shifted;
 	bool opposite_direction;
