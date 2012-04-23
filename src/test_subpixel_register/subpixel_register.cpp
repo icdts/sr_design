@@ -124,13 +124,13 @@ float subpixel_register(input_image *hr_input, input_image *lr_input, int ds, in
 
       score_array[sid] =  final_score; //store the resulting score in the array
       sid += 1;
-      if (final_score > hr_input->score){
+      if (final_score > lr_input->score){
         // if the new score is better put a new best in the passed image
         // since it was passed by reference this changes the input_image
         // struct in the above function as well
-        hr_input->score = final_score;
-        hr_input->horizontal_shift = i; 
-        hr_input->vertical_shift = j;
+        lr_input->score = final_score;
+        lr_input->horizontal_shift = i; 
+        lr_input->vertical_shift = j;
       }
 
       final_score = 0; //reset score
@@ -139,9 +139,10 @@ float subpixel_register(input_image *hr_input, input_image *lr_input, int ds, in
 
   //determine probability by dividing best score by sum of scores
   for (int i=0; i<289; i++){
-    hr_input->prob += score_array[i];
+    lr_input->prob += score_array[i];
+	//cout << "score at this blasted place is  " << score_array[i] << endl;
   }
-  hr_input->prob = hr_input->score / hr_input->prob;
+  lr_input->prob = lr_input->score / lr_input->prob;
 
-	return hr_input->prob;
+	return lr_input->prob;
 }
