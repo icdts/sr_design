@@ -25,6 +25,7 @@ int main(int argc, char* argv[]){
     cout << "Usage: functioncall ImagetoUse" << endl;
     return -1;
     }*/
+<<<<<<< HEAD
 int rescale_factor = 4;
 input_image image;
 input_image curr;
@@ -67,6 +68,50 @@ for(int i = 0; i<input.size(); i++){
 }
 imshow("pop", output);
 waitKey(0);
+=======
+	int rescale_factor = 4;
+	input_image image;
+	input_image curr;
+	vector <input_image> input;
+	curr.file = imread("../coffee.jpg");
+	//imshow("pop", curr.file);	
+	resize(curr.file, curr.file, Size(), 4, 4, CV_INTER_AREA);
+	curr.file = shiftMat(curr.file, -3, 4);
+	input.push_back(curr);
+	curr.file = imread("../coffee.jpg");
+	resize(curr.file, curr.file, Size(), 4, 4, CV_INTER_AREA);
+	curr.file = shiftMat(curr.file, -6, 0);
+	input.push_back(curr);
+	curr.file = imread("../coffee.jpg");
+	resize(curr.file, curr.file, Size(), 4, 4, CV_INTER_AREA);
+	curr.file = shiftMat(curr.file, 3, 4);
+	input.push_back(curr);
+	curr.file = imread("../coffee.jpg");
+	resize(curr.file, curr.file, Size(), 4, 4, CV_INTER_AREA);
+	curr.file = shiftMat(curr.file, 0, -4);
+	input.push_back(curr);
+	curr.file = imread("../coffee.jpg");
+	resize(curr.file, curr.file, Size(), 4, 4, CV_INTER_AREA);
+	curr.file = shiftMat(curr.file, 5, -2);
+	input.push_back(curr);
+	cout << "third" << endl;
+	image.file = imread("../coffee.jpg");
+
+	Mat kron_image;
+	//resize(image.file, image.file, Size(), 4, 4, CV_INTER_AREA);
+
+	Mat output = sr_one_step_wb(image, input);
+	cout << "working" << endl;
+	for(int i = 0; i<input.size(); i++){
+		cout << "horizontal shift: " << input[i].horizontal_shift;
+		cout << ", vertical shift: " << input[i].vertical_shift << endl;
+		cout << "prob" << input[i].prob << endl;
+	}
+
+	imshow("output", output);
+	waitKey(0);
+	system("pause");
+>>>>>>> 729800159567a24b572608694ccfccebc2076c3a
 	return 0;
 }
 
@@ -100,6 +145,7 @@ waitKey(0);
 imshow("2", image);
 waitKey(0);
 		//if the probability for the input image is high, add the shift to the output
+<<<<<<< HEAD
 		if (input[tid].prob > 0.0){
 			sh_image=shiftMat(kron_image, -input[tid].vertical_shift, -input[tid].horizontal_shift);
 			imshow("3", sh_image);
@@ -107,6 +153,11 @@ waitKey(0);
 			cout << "image rows: " << image.rows << ", sh_image rows: " << sh_image.rows << endl;
 			cout << "image cols: " << image.cols << ", sh_image cols: " << sh_image.cols << endl;
 			image = sh_image + image;
+=======
+		if (input[tid].prob > 0.9){
+			sh_image=shiftMat(kron_image, -input[tid].vertical_shift, -input[tid].horizontal_shift);
+			image += sh_image;
+>>>>>>> 729800159567a24b572608694ccfccebc2076c3a
 		}
 	}
 	return image;
