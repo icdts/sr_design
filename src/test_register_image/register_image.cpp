@@ -56,8 +56,7 @@ void adjustments(Mat& im1, Mat& im2){
     divide(im2,im2_mean,im2,1);
 }
 
-Mat fftShift(Mat& input)
-{
+Mat fftShift(Mat& input){
     Mat out = input;
 
     vector<Mat> planes;
@@ -88,7 +87,7 @@ Mat fftShift(Mat& input)
     return out;
 }
 
-Mat fft_math(Mat &input1, Mat &input2){
+Mat fftMath(Mat &input1, Mat &input2, bool t){
     Mat im1;
     Mat im2;
 
@@ -107,9 +106,9 @@ Mat fft_math(Mat &input1, Mat &input2){
     im1 = im1.mul(im2);
 
     /*
-        %fftshift moves fft so zero frequency 
+        %fftShift moves fft so zero frequency 
         %component is in middle, ifft2 inverse fft    debug("Reverse FFT");
-        f=fftshift(abs(ifft2(tmp))); 
+        f=fftShift(abs(ifft2(tmp))); 
     */
     debug("Reverse fft");
     idft(im1,im1,DFT_REAL_OUTPUT);
@@ -118,7 +117,7 @@ Mat fft_math(Mat &input1, Mat &input2){
     im1 = abs(im1);
 
     debug("Shift zero frequencies to the middle");
-    im1 = fftshift(im1);
+    im1 = fftShift(im1);
 
     return im1;
 }
@@ -149,7 +148,7 @@ Mat register_image(Mat input1, Mat input2){
     for(int i = 0; i < channels_im1.size(); i++){
         adjustments(channels_im1[i],channels_im2[i]);
 
-        fft_return = fft_return + fft_math(channels_im1[i],channels_im2[i]);
+        fft_return = fft_return + fftMath(channels_im1[i],channels_im2[i],true);
     }
 
     //Find maximum element
