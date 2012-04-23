@@ -56,25 +56,36 @@ void adjustments(Mat& im1, Mat& im2){
     divide(im2,im2_mean,im2,1);
 }
 
-Mat fftshift(Mat& input){
-    Mat output;
-    int half_x;
-    int half_y;
-    int new_i;
-    int new_j;
+Mat fftShift(Mat& input)
+{
+    Mat out = input;
 
-    output = input.clone();
-    half_y = input.cols / 2;
-    half_x = input.rows / 2;
+    vector<Mat> planes;
+    split(out, planes);
 
-    for(int i=0; i<input.rows; i++){
-        for(int j=0; j<input.cols; j++){
-            new_i = (i + half_x) % input.rows;
-            new_j = (j + half_y) % input.cols;
-            output.at<float>(new_i,new_j) = input.at<float>(i,j);
-        }
+    int xMid = out.cols >> 1;
+    int yMid = out.rows >> 1;
+
+    for(size_t i = 0; i < planes.size(); i++)
+    {
+        // perform quadrant swaps...
+        Mat tmp;
+        Mat q0(planes[i], Rect(0,    0,    xMid, yMid));
+        Mat q1(planes[i], Rect(xMid, 0,    xMid, yMid));
+        Mat q2(planes[i], Rect(0,    yMid, xMid, yMid));
+        Mat q3(planes[i], Rect(xMid, yMid, xMid, yMid));
+    
+        q0.copyTo(tmp);
+        q3.copyTo(q0);
+        tmp.copyTo(q3);
+    
+        q1.copyTo(tmp);
+        q2.copyTo(q1);
+        tmp.copyTo(q2);
     }
-    return output;
+
+    merge(planes, out);
+    return out;
 }
 
 Mat fft_math(Mat &input1, Mat &input2){
