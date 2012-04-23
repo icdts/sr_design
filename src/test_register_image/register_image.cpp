@@ -104,10 +104,33 @@ Mat register_image(Mat input1, Mat input2){
     input1.copyTo(im1);
     input2.copyTo(im2);
 
-    if(
-        (im1.channels() == 1 && im2.channels() == 1) ||
-        (im1.channels() == 3 && im2.channels() == 3)
-    ){
+    if(im1.channels() == 1 && im2.channels() == 1){
+        Mat window;
+        Mat im1_mean;
+        Mat im2_mean;
+
+        debug("Mitigating Boundary Effect");
+        window = gen_window(im1.rows,im1.cols,0.05,0.05,im1.channels());
+
+        debug("Got window back");
+        im1 = window.mul(im1);
+        im2 = window.mul(im2);
+
+        debug("Fake Normalizing");
+        //Normalize result
+        im1.copyTo(im1_mean);
+        im2.copyTo(im2_mean);
+        im1_mean.setTo(mean(im1));
+        im2_mean.setTo(mean(im2));
+        divide(im1,im1_mean,im1,1);
+        divide(im2,im2_mean,im2,1);
+
+        debug("Do fft transforms");
+        im2_mean = fft_math(im1,im2);
+
+        debug("Returning shifted img");
+        fft_return = fft_math(im1,im2);
+    }else if(im1.channels() == 3 && im2.channels() == 3){
         //TODO:  Test to see if one channel images can be done this way?
             //Not sure what all the windowing and dividing accomplishes.
         vector<Mat> channels_im1;
@@ -144,7 +167,7 @@ Mat register_image(Mat input1, Mat input2){
     //sh(1)=(mod(shid-1,size(im1,1))+1)-size(im1,1)/2;
     //sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
     x = (((shid-1)%im1.rows) + 1) - (im1.rows/2);
-    y = ceil((shid-1)/im1.rows) - (im1.rows/2);
+    y = ceil((shid-1)/im1.rows) - (im1.cols/2);
 
     return shiftMat(input2,x,y);   
 }
