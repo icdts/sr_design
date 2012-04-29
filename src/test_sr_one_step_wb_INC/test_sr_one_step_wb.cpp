@@ -37,27 +37,27 @@ curr.file = imread("1.jpg");
 
 curr.file = shiftMat(curr.file, -3, 4);
 input.push_back(curr);
-curr.file = imread("1.jpg");
+curr.file = imread("2.jpg");
 
 curr.file = shiftMat(curr.file, -6, 0);
 input.push_back(curr);
-curr.file = imread("1.jpg");
+curr.file = imread("3.jpg");
 
 curr.file = shiftMat(curr.file, 3, 4);
 input.push_back(curr);
-curr.file = imread("1.jpg");
+curr.file = imread("4.jpg");
 
 curr.file = shiftMat(curr.file, 0, -4);
 input.push_back(curr);
-curr.file = imread("1.jpg");
+//curr.file = imread("1.jpg");
 
-curr.file = shiftMat(curr.file, 5, -2);
-input.push_back(curr);
+//curr.file = shiftMat(curr.file, 5, -2);
+//input.push_back(curr);
 cout << "third" << endl;
 image.file = imread("1.jpg");
 
 Mat kron_image;
-resize(image.file, image.file, Size(), 4, 4, CV_INTER_AREA);
+resize(image.file, image.file, Size(), 2, 2, CV_INTER_AREA);
 
 Mat output = sr_one_step_wb(image, input);
 cout << "working" << endl;
@@ -67,6 +67,10 @@ for(int i = 0; i<input.size(); i++){
 	cout << ", probability: " << input[i].prob << endl;
 }
 imshow("pop", output);
+waitKey(0);
+GaussianBlur(output, output, cv::Size(0, 0), 3);
+addWeighted(output, 1.5, output, -0.5, 0, output);
+imshow("blurred", output);
 waitKey(0);
 
 	return 0;
@@ -81,7 +85,7 @@ Mat sr_one_step_wb(input_image &src, vector <input_image> &input){
 	for (int tid = 0; tid < input.size(); tid++){
 		//curr = input[tid];
 		cout<<"I made it "<<tid<<"times!"<<endl;
-		input[tid].prob = subpixel_register(&src, &input[tid], 4, -1);
+		input[tid].prob = subpixel_register(&src, &input[tid], 2, -1);
 			cout << "horizontal shift: " << input[tid].horizontal_shift;
 	cout << ", vertical shift: " << input[tid].vertical_shift;
 	cout << ", probability: " << input[tid].prob << endl;
@@ -93,12 +97,12 @@ Mat sr_one_step_wb(input_image &src, vector <input_image> &input){
 	image.reshape(2, src.file.rows);
 	Mat sh_image(src.file.rows, src.file.cols, CV_32FC1, Scalar(0));
 	cout << "fifth" << endl;
-	resize(image, image, Size(), 4, 4, CV_INTER_AREA);
+	resize(image, image, Size(), 2, 2, CV_INTER_AREA);
 	for (int tid = 0; tid < input.size(); tid++){
 		//Resize image by a scale of 4, which was done with a kron product in matlab
 		
 		cout << "sixth" << endl;
-		resize(input[tid].file, kron_image, Size(), 4, 4, CV_INTER_AREA);
+		resize(input[tid].file, kron_image, Size(), 2, 2, CV_INTER_AREA);
 		cout << "seventh" << endl;
 		//imshow("1", kron_image);
 		//waitKey(0);
@@ -114,7 +118,7 @@ Mat sr_one_step_wb(input_image &src, vector <input_image> &input){
 			image = (sh_image + image)/2;
 			//kron_image = (kron_image + kron_image) / 2;
 			//imshow("4", kron_image);
-			waitKey(0);
+			//waitKey(0);
 	}
 	}
 	return image;
