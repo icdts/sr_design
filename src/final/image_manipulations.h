@@ -1,9 +1,7 @@
-#ifdef _MSC_VER
-#else
+
 	#include <opencv/cv.h>
 	#include <opencv2/core/core.hpp>
 	#include <opencv2/highgui/highgui.hpp>
-#endif
 #include <iostream>
 
 cv::Mat shiftMat(cv::Mat, int, int);

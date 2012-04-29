@@ -30,76 +30,140 @@ sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
 %this is still somewhat unclear
 im2_reg=shift_image(oim2,sh);
 */
-cv::Mat register_image(cv::Mat input1, cv::Mat input2){
-    cv::Mat im1;
-    cv::Mat im2;
-    cv::Mat window;
-    cv::Mat flipped_im2;
-    cv::Mat tmp1;
-    cv::Mat tmp2;
-    CvPoint max;
 
-    int x;
-    int y;
+using namespace std;
+using namespace cv;
 
-    int shid;
+void adjustments(Mat& im1, Mat& im2){
+    Mat window;
+    Mat im1_mean;
+    Mat im2_mean;
 
-    //Deep copies to keep from changing original
-    input1.copyTo(im1);
-    input2.copyTo(im2);
-
-    //Mitigate boundary effect
+    debug("Mitigating Boundary Effect");
     window = gen_window(im1.rows,im1.cols,0.05,0.05,im1.channels());
+
+    debug("Got window back");
     im1 = window.mul(im1);
     im2 = window.mul(im2);
 
+    debug("Fake Normalizing");
     //Normalize result
-    im1 = im1.mul(1/im1.mean());
-    im2 = im2.mul(1/im2.mean());
+    im1.copyTo(im1_mean);
+    im2.copyTo(im2_mean);
+    im1_mean.setTo(mean(im1));
+    im2_mean.setTo(mean(im2));
+    divide(im1,im1_mean,im1,1);
+    divide(im2,im2_mean,im2,1);
+}
 
-    //Flip left-right and up-down
-    cv::flip(im2,flipped_im2,-1);
+Mat fftShift(Mat& input){
+    Mat out = input;
 
-    //First fft2
-    dft(im1,tmp1,DFT_COMPLEX_OUTPUT);
+    vector<Mat> planes;
+    split(out, planes);
 
-    //Second fft2
-    dft(flipped_im2,tmp2,DFT_COMPLEX_OUTPUT);
+    int xMid = out.cols >> 1;
+    int yMid = out.rows >> 1;
 
-    //Multiply on element-by-element basis
-    tmp1 = tmp1.mul(tmp2);
+    for(size_t i = 0; i < planes.size(); i++)
+    {
+        // perform quadrant swaps...
+        Mat tmp;
+        Mat q0(planes[i], Rect(0,    0,    xMid, yMid));
+        Mat q1(planes[i], Rect(xMid, 0,    xMid, yMid));
+        Mat q2(planes[i], Rect(0,    yMid, xMid, yMid));
+        Mat q3(planes[i], Rect(xMid, yMid, xMid, yMid));
+    
+        q0.copyTo(tmp);
+        q3.copyTo(q0);
+        tmp.copyTo(q3);
+    
+        q1.copyTo(tmp);
+        q2.copyTo(q1);
+        tmp.copyTo(q2);
+    }
 
-    //Reverse fft
-    idft(tmp1,tmp2,DFT_COMPLEX_OUTPUT);
+    merge(planes, out);
+    return out;
+}
 
-    //Shift zero frequencies to the middle
-    tmp2 = fftshift(abs(tmp2));
+Mat fftMath(Mat &input1, Mat &input2, bool t){
+    Mat im1;
+    Mat im2;
+
+    //Deep copy to protect original contents
+    input1.copyTo(im1);
+    input2.copyTo(im2);
+
+    debug("Flipping im2 left-right and up-down");
+    flip(im2,im2,-1);
+
+    debug("FFT calls");
+    dft(im1,im1,DFT_COMPLEX_OUTPUT);
+    dft(im2,im2,DFT_COMPLEX_OUTPUT);
+
+    debug("Multipy on element-by-element basis");
+    im1 = im1.mul(im2);
+
+    /*
+        %fftShift moves fft so zero frequency 
+        %component is in middle, ifft2 inverse fft    debug("Reverse FFT");
+        f=fftShift(abs(ifft2(tmp))); 
+    */
+    debug("Reverse fft");
+    idft(im1,im1,DFT_REAL_OUTPUT);
+
+    debug("Abs of result");    
+    im1 = abs(im1);
+
+    debug("Shift zero frequencies to the middle");
+    im1 = fftShift(im1);
+
+    return im1;
+}
+
+Mat register_image(Mat input1, Mat input2){
+    Mat im1;
+    Mat im2;
+    Point max;
+    int x;
+    int y;
+    int shid;
+    Mat fft_return;
+
+    //Deep copies to keep from changing original
+    debug("Deep Copying");
+    input1.copyTo(im1);
+    input2.copyTo(im2);
+
+    //TODO:  Test to see if one channel images can be done this way?
+        //Not sure what all the windowing and dividing accomplishes.
+    vector<Mat> channels_im1;
+    vector<Mat> channels_im2;
+
+    split(im1,channels_im1);
+    split(im2,channels_im2);
+    fft_return = Mat::zeros(im1.rows,im1.cols,CV_32FC1);
+
+    for(int i = 0; i < channels_im1.size(); i++){
+        adjustments(channels_im1[i],channels_im2[i]);
+
+        fft_return = fft_return + fftMath(channels_im1[i],channels_im2[i],true);
+    }
 
     //Find maximum element
-    minMaxLoc(tmp2,NULL,NULL,NULL,&max);
+    debug("Finding max loc");
+    minMaxLoc(
+        fft_return, 
+        NULL, NULL, NULL, //Don't want the max/min value or min location
+        &max, //Want the maximum location
+        Mat::ones(fft_return.rows, fft_return.cols, CV_8UC1) //No masking eles
+    );
+    //Shift based on that maximum
+    cerr << "MAX: " << max.x << "," << max.y << endl;
+    x = max.y - (im1.rows/2);
+    y = max.x - (im1.cols/2);
+    cerr << "SHIFT: " << x << ", " << y << endl;
 
-    //replicating Matlab, no good explination
-    shid = (max.x * tmp2.rows) + max.y;
-
-    //%make a point based on the middle of the image
-    //sh(1)=(mod(shid-1,size(im1,1))+1)-size(im1,1)/2;
-    //sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
-    x = (((shid-1)%im1.rows) + 1) - (im1.rows/2);
-    y = Math.ceil((shid-1)/im1.rows) - (im1.rows/2);
-
-    return shiftImage(input2,x,y);   
-}
-cv::Mat fftshift(const cv::Mat & input){
-    cv::Mat output = input.clone();
-    int half_x = input.rows / 2;
-    int half_y = input.cols / 2;
-    int new_i, new_j;
-    for(int i=0; i<input.rows; i++){
-        for(int j=0; j<input.cols; j++){
-            new_i = (i + half_x) % input.rows;
-            new_j = (j + half_y) % input.cols;
-            output.at<uchar>(new_i,new_j) = input.at<uchar>(i,j);
-        }
-    }
-    return output;
+    return shiftMat(input2,x,y);   
 }
