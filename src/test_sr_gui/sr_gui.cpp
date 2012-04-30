@@ -26,15 +26,16 @@ int main(int argc, char const *argv[]){
 
 	//	Handle input
 	
-	if(argv==1||argv>4){
-		cout<<"Invalid arguments.\n\nExecution should be of the format:\n s"+
-		"r_gui ([-c])[LOAD_DIRECTORY]([OUTPUT_DIRECTORY])\n"<<endl;
+	if(argc==1||argc>4){
+		cout<< "Invalid arguments.\n\nExecution should be of the format:\n s"
+			<< "r_gui ([-c])[LOAD_DIRECTORY]([OUTPUT_DIRECTORY])\n"
+			<< endl;
 		return -1;
 	}
 
-	if(argv==2){
+	if(argc==2){
 		loadDirectoryIndex = 1;
-	} else if(argv == 3){
+	} else if(argc == 3){
 		if(argv[1] == "-c"){
 			color = true;
 			loadDirectoryIndex = 2;
@@ -42,14 +43,15 @@ int main(int argc, char const *argv[]){
 			loadDirectoryIndex = 1;
 			saveDirectoryIndex = 2;
 		}
-	} else if(argv == 4){
+	} else if(argc == 4){
 		if(argv[1] == "-c"){
 			color = true;
 			loadDirectoryIndex = 2;
 			saveDirectoryIndex = 3;
 		} else{
-			cout<<"Invalid arguments.\n\nExecution should be of the format:\n s"+
-			"r_gui ([-c])[LOAD_DIRECTORY]([OUTPUT_DIRECTORY])\n"<<endl;
+			cout<< "Invalid arguments.\n\nExecution should be of the format:\n s"
+				<< "r_gui ([-c])[LOAD_DIRECTORY]([OUTPUT_DIRECTORY])\n"
+				<< endl;
 			return -1;
 		}
 	}
@@ -61,7 +63,7 @@ int main(int argc, char const *argv[]){
 	// #2
 	
 	cout<<"Registering Images"<<endl;
-	for(int i = 1; i < 1+(int)images.size; i++){
+	for(int i = 1; i < 1+(int)images.size(); i++){
 		register_image(images[0], images[i]);
 	}
 
@@ -104,7 +106,7 @@ int main(int argc, char const *argv[]){
 */
 	cout<<"Starting Super-resolution Algorigthm"<<endl;
 
-	Mat final = sr_one_step(images[0].file, images);
+	Mat final = sr_one_step(images[0], images);
 
 	/*if(color){
 
@@ -113,14 +115,16 @@ int main(int argc, char const *argv[]){
 							 will be somehow involved.');
 	}*/
 
+	string name = "output.jpg";
 	if(saveDirectoryIndex){
-		imwrite(argv[saveDirectoryIndex]+"output.jpg", final);
+		name = argv[saveDirectoryIndex] + name;
+		imwrite(name, final);
 	} else{
-		imwrite(output.jpg, final);
+		imwrite(name, final);
 	}
 
-	imShow("Result", final);
-	waitkey(0);
+	imshow("Result", final);
+	waitKey(0);
 
 	return 0;
 }
