@@ -34,162 +34,106 @@ im2_reg=shift_image(oim2,sh);
 using namespace std;
 using namespace cv;
 
-void adjustments(Mat& im1, Mat& im2){
-    Mat window;
-    Mat im1_mean;
-    Mat im2_mean;
+Point phase_correlation( Mat m_ref, Mat m_tpl ){
+    IplImage * poc;
+    IplImage ref = m_ref;
+    IplImage tpl = m_tpl;
 
-    debug("Mitigating Boundary Effect");
-    window = gen_window(im1.cols,im1.rows,0.05,0.05,im1.channels());
-
-    debug("Got window back");
-    im1 = window.mul(im1);
-    debug("window2");
-    im2 = window.mul(im2);
-
-    debug("Fake Normalizing");
-    //Normalize result
-    im1.copyTo(im1_mean);
-    im2.copyTo(im2_mean);
-    im1_mean.setTo(mean(im1));
-    im2_mean.setTo(mean(im2));
-    divide(im1,im1_mean,im1,1);
-    divide(im2,im2_mean,im2,1);
-}
-
-Mat fftShift(Mat& input){
-    Mat out = input;
-
-    vector<Mat> planes;
-    split(out, planes);
-
-    int xMid = out.cols >> 1;
-    int yMid = out.rows >> 1;
-
-    for(size_t i = 0; i < planes.size(); i++)
-    {
-        // perform quadrant swaps...
-        Mat tmp;
-        Mat q0(planes[i], Rect(0,    0,    xMid, yMid));
-        Mat q1(planes[i], Rect(xMid, 0,    xMid, yMid));
-        Mat q2(planes[i], Rect(0,    yMid, xMid, yMid));
-        Mat q3(planes[i], Rect(xMid, yMid, xMid, yMid));
+    int     i, j, k;
+    double  tmp;
     
-        q0.copyTo(tmp);
-        q3.copyTo(q0);
-        tmp.copyTo(q3);
+    /* get image properties */
+    int width    = ref.width;
+    int height   = ref.height;
+    int step     = ref.widthStep;
+    int fft_size = width * height;
+
+    /* create a new image, to store phase correlation result */
+    poc = cvCreateImage( cvSize( tpl.width, tpl.height ), IPL_DEPTH_64F, 1 );
+
+    /* setup pointers to images */
+    uchar   *ref_data = ( uchar* ) ref.imageData;
+    uchar   *tpl_data = ( uchar* ) tpl.imageData;
+    double  *poc_data = ( double* )poc->imageData;
     
-        q1.copyTo(tmp);
-        q2.copyTo(q1);
-        tmp.copyTo(q2);
+    /* allocate FFTW input and output arrays */
+    fftw_complex *img1 = ( fftw_complex* )fftw_malloc( sizeof( fftw_complex ) * width * height );
+    fftw_complex *img2 = ( fftw_complex* )fftw_malloc( sizeof( fftw_complex ) * width * height );
+    fftw_complex *res  = ( fftw_complex* )fftw_malloc( sizeof( fftw_complex ) * width * height );   
+    
+    /* setup FFTW plans */
+    fftw_plan fft_img1 = fftw_plan_dft_1d( width * height, img1, img1, FFTW_FORWARD,  FFTW_ESTIMATE );
+    fftw_plan fft_img2 = fftw_plan_dft_1d( width * height, img2, img2, FFTW_FORWARD,  FFTW_ESTIMATE );
+    fftw_plan ifft_res = fftw_plan_dft_1d( width * height, res,  res,  FFTW_BACKWARD, FFTW_ESTIMATE );
+    
+    /* load images' data to FFTW input */
+    for( i = 0, k = 0 ; i < height ; i++ ) {
+        for( j = 0 ; j < width ; j++, k++ ) {
+            img1[k][0] = ( double )ref_data[i * step + j];
+            img1[k][1] = 0.0;
+            
+            img2[k][0] = ( double )tpl_data[i * step + j];
+            img2[k][1] = 0.0;
+        }
+    }
+    
+    /* obtain the FFT of img1 */
+    fftw_execute( fft_img1 );
+    
+    /* obtain the FFT of img2 */
+    fftw_execute( fft_img2 );
+    
+    /* obtain the cross power spectrum */
+    for( i = 0; i < fft_size ; i++ ) {
+        res[i][0] = ( img2[i][0] * img1[i][0] ) - ( img2[i][1] * ( -img1[i][1] ) );
+        res[i][1] = ( img2[i][0] * ( -img1[i][1] ) ) + ( img2[i][1] * img1[i][0] );
+
+        tmp = sqrt( pow( res[i][0], 2.0 ) + pow( res[i][1], 2.0 ) );
+
+        res[i][0] /= tmp;
+        res[i][1] /= tmp;
     }
 
-    merge(planes, out);
-    return out;
-}
+    /* obtain the phase correlation array */
+    fftw_execute(ifft_res);
 
-Mat fftMath(Mat &input1, Mat &input2, bool t){
-    Mat im1;
-    Mat im2;
+    /* normalize and copy to result image */
+    for( i = 0 ; i < fft_size ; i++ ) {
+        poc_data[i] = res[i][0] / ( double )fft_size;
+    }
 
-    //Deep copy to protect original contents
-    input1.copyTo(im1);
-    input2.copyTo(im2);
+        /* find the maximum value and its location */
+    CvPoint minloc, maxloc;
+    double  minval, maxval;
+    cvMinMaxLoc( poc, &minval, &maxval, &minloc, &maxloc, 0 );
 
-    debug("Flipping im2 left-right and up-down");
-    flip(im2,im2,-1);
+    /* deallocate FFTW arrays and plans */
+    fftw_destroy_plan( fft_img1 );
+    fftw_destroy_plan( fft_img2 );
+    fftw_destroy_plan( ifft_res );
+    fftw_free( img1 );
+    fftw_free( img2 );
+    fftw_free( res );   
 
-    debug("FFT calls");
-    dft(im1,im1,DFT_COMPLEX_OUTPUT);
-    transpose(im1,im1);
-    dft(im1,im1,DFT_COMPLEX_OUTPUT);
-    transpose(im1,im1);
+    cvReleaseImage(&poc);
 
-    printMatrix(im1);
-    dft(im2,im2,DFT_COMPLEX_OUTPUT);
-    transpose(im2,im2);
-    dft(im2,im2,DFT_COMPLEX_OUTPUT);
-    transpose(im2,im2);
-
-    /*
-    transpose(im1,im1);
-    transpose(im2,im2);
-
-    dft(im1,im1,DFT_COMPLEX_OUTPUT);
-    dft(im2,im2,DFT_COMPLEX_OUTPUT);
-
-    transpose(im1,im1);
-    transpose(im2,im2);
-    */
-    debug("Multipy on element-by-element basis");
-    im1 = im1.mul(im2);
-
-    debug("After fft2(weafw) .* fft2(fiawo) or something");
-    printMatrix(im1);
-    /*
-        %fftShift moves fft so zero frequency 
-        %component is in middle, ifft2 inverse fft    debug("Reverse FFT");
-        f=fftShift(abs(ifft2(tmp))); 
-    */
-    debug("Reverse fft");
-    idft(im1,im1,DFT_REAL_OUTPUT);
-    transpose(im1,im1);
-    idft(im1,im1,DFT_REAL_OUTPUT);
-    transpose(im1,im1);
-
-    debug("Abs of result");    
-    im1 = abs(im1);
-
-    debug("Shift zero frequencies to the middle");
-    im1 = fftShift(im1);
-
-    return im1;
+    return maxloc;
 }
 
 Mat register_image(Mat input1, Mat input2){
     Mat im1;
     Mat im2;
-    Point max;
-    int x;
-    int y;
-    int shid;
-    Mat fft_return;
+    Point shift;
 
     //Deep copies to keep from changing original
     debug("Deep Copying");
     input1.copyTo(im1);
     input2.copyTo(im2);
 
-    //TODO:  Test to see if one channel images can be done this way?
-        //Not sure what all the windowing and dividing accomplishes.
-    vector<Mat> channels_im1;
-    vector<Mat> channels_im2;
+    shift = phase_correlation(im1,im2);
 
-    split(im1,channels_im1);
-    split(im2,channels_im2);
-    fft_return = Mat::zeros(im1.rows,im1.cols,CV_32FC1);
-
-    for(int i = 0; i < channels_im1.size(); i++){
-        //adjustments(channels_im1[i],channels_im2[i]);
-        debug("=== Channel");
-        printMatrix(channels_im1[i]);
-        printMatrix(channels_im2[i]);
-        fft_return = fft_return + fftMath(channels_im1[i],channels_im2[i],true);
-    }
-
-    //Find maximum element
-    debug("Finding max loc");
-    minMaxLoc(
-        fft_return, 
-        NULL, NULL, NULL, //Don't want the max/min value or min location
-        &max, //Want the maximum location
-        Mat::ones(fft_return.rows, fft_return.cols, CV_8UC1) //No masking eles
-    );
     //Shift based on that maximum
-    cerr << "MAX: " << max.x << "," << max.y << endl;
-    x = max.y - (im1.rows/2);
-    y = max.x - (im1.cols/2);
-    cerr << "SHIFT: " << x << ", " << y << endl;
+    cerr << "SHIFT: " << shift.x << "," << shift.y << endl;
 
-    return shiftMat(input2,x,y);   
+    return shiftMat(input2,shift.x,shift.y);   
 }

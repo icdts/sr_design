@@ -4,13 +4,13 @@ IM_LOC=../final/
 
 all: test phase_correlation
 test: test.o register_image.o image_manipulations.o gen_window.o debug.o
-	g++ -o test test.o register_image.o image_manipulations.o gen_window.o debug.o $(OPENCV_INCS)
+	g++ -o test test.o register_image.o image_manipulations.o gen_window.o debug.o $(OPENCV_INCS) $(FFTW_INCS)
 
 test.o: test.cpp register_image.h
 	g++ -c test.cpp $(OPENCV_INCS)
 
 register_image.o: register_image.cpp register_image.h $(IM_LOC)image_manipulations.h
-	g++ -c register_image.cpp $(OPENCV_INCS)
+	g++ -c register_image.cpp $(OPENCV_INCS) $(FFTW_INCS)
 
 image_manipulations.o: $(IM_LOC)image_manipulations.cpp $(IM_LOC)image_manipulations.h
 	g++ -c $(IM_LOC)image_manipulations.cpp $(OPENCV_INCS)

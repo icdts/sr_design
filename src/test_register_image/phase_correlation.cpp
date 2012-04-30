@@ -11,27 +11,25 @@
 #include "highgui.h"
 #include "fftw3.h"
 
-CvPoint phase_correlation( IplImage *ref, IplImage *tpl );
+
+using namespace std;
+using namespace cv;
+
+Point phase_correlation( Mat ref, Mat tpl );
 
 int main( int argc, char** argv )
 {
-	IplImage *tpl = 0;
-	IplImage *ref = 0;
+	Mat tpl;
+	Mat ref;
 	
-	/* load reference image */
-	ref = cvLoadImage( argv[1], CV_LOAD_IMAGE_GRAYSCALE );
-	
-	/* load template image */
-	tpl = cvLoadImage( argv[2], CV_LOAD_IMAGE_GRAYSCALE );
+	ref = imread( argv[1], CV_LOAD_IMAGE_GRAYSCALE );
+	tpl = imread( argv[2], CV_LOAD_IMAGE_GRAYSCALE );
 	
 	/* get phase correlation of input images */
-	CvPoint maxloc = phase_correlation( ref, tpl );
+	Point maxloc = phase_correlation( ref, tpl );
 	
 	/* print it */
 	fprintf( stdout, "Maxval at (%d, %d) \n", maxloc.x, maxloc.y );
-	
-	cvReleaseImage( &tpl );
-	cvReleaseImage( &ref );
 	
 	return 0;
 }
@@ -39,24 +37,26 @@ int main( int argc, char** argv )
 /*
  * get phase correlation from two images and save result to the third image
  */
-CvPoint phase_correlation( IplImage *ref, IplImage *tpl ){
-	IplImage *poc;
+Point phase_correlation( Mat m_ref, Mat m_tpl ){
+	IplImage * poc;
+	IplImage ref = m_ref;
+	IplImage tpl = m_tpl;
 
 	int 	i, j, k;
 	double	tmp;
 	
 	/* get image properties */
-	int width  	 = ref->width;
-	int height   = ref->height;
-	int step     = ref->widthStep;
+	int width  	 = ref.width;
+	int height   = ref.height;
+	int step     = ref.widthStep;
 	int fft_size = width * height;
 
 	/* create a new image, to store phase correlation result */
-	poc = cvCreateImage( cvSize( tpl->width, tpl->height ), IPL_DEPTH_64F, 1 );
+	poc = cvCreateImage( cvSize( tpl.width, tpl.height ), IPL_DEPTH_64F, 1 );
 
 	/* setup pointers to images */
-	uchar 	*ref_data = ( uchar* ) ref->imageData;
-	uchar 	*tpl_data = ( uchar* ) tpl->imageData;
+	uchar 	*ref_data = ( uchar* ) ref.imageData;
+	uchar 	*tpl_data = ( uchar* ) tpl.imageData;
 	double 	*poc_data = ( double* )poc->imageData;
 	
 	/* allocate FFTW input and output arrays */
@@ -117,6 +117,8 @@ CvPoint phase_correlation( IplImage *ref, IplImage *tpl ){
 	fftw_free( img1 );
 	fftw_free( img2 );
 	fftw_free( res );	
+
+	cvReleaseImage(&poc);
 
 	return maxloc;
 }
