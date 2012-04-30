@@ -33,5 +33,6 @@ Mat sr_one_step(input_image *src, vector <input_image> *input){
 			image = (sh_image + image)/2;
 		}
 	}
+	resize(image, image, .25, .25, CV_INTER_AREA);
 	return image;
 }
