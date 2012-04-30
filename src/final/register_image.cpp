@@ -2,13 +2,19 @@
 
 /******************************************************************************
 
-    phase_correlation summary here.
+    phase_correlation accepts two Mat variables as parameters.  This program
+    takes two images of equal size and uses the FFTW library to assess the two
+    images' similarity to one another.
 
     phase_correlation:
         Mat m_ref:
-
+            Reference image.  This is the first image passed to the function.
         Mat m_tpl:
-        
+            Template image.  This is the second image passed to the function, to
+            which the first image is compared.
+
+    Full disclosure:
+
 
 ******************************************************************************/
 
@@ -18,6 +24,8 @@ using namespace cv;
 Point phase_correlation( Mat m_ref, Mat m_tpl ){
     debug("Phase correlation called");
     IplImage * poc;
+    
+    /*  */
     IplImage ref = m_ref;
     IplImage tpl = m_tpl;
 
@@ -106,7 +114,7 @@ Point phase_correlation( Mat m_ref, Mat m_tpl ){
         poc_data[i] = res[i][0] / ( double )fft_size;
     }
 
-        /* find the maximum value and its location */
+    /* find the maximum value and its location */
     CvPoint minloc, maxloc;
     double  minval, maxval;
     cvMinMaxLoc( poc, &minval, &maxval, &minloc, &maxloc, 0 );
@@ -119,7 +127,11 @@ Point phase_correlation( Mat m_ref, Mat m_tpl ){
     fftw_free( img2 );
     fftw_free( res );   
 
+
+    /* deallocate IplImage variables */
     cvReleaseImage(&poc);
+    cvReleaseImage(ref);
+    cvReleaseImage(tmp);
 
     return maxloc;
 }
@@ -174,5 +186,5 @@ void register_image(input_image * input1, input_image * input2){
     input2->vertical_shift = shift.y;
 
     input2->file.convertTo(im1,CV_8U);
-    imwrite("registered" + input2->name + ".jpg",im1);
+    //imwrite("registered" + input2->name + ".jpg",im1);
 }
