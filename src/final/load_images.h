@@ -11,4 +11,4 @@
 #include "input_image.h"
 #include "debug.h"
 
-std::vector<input_image> load_images(std::string dir);
+void load_images(std::string dir,std::vector<input_image> *);

@@ -3,7 +3,7 @@ FFTW_INCS=`pkg-config --cflags --libs fftw3`
 IM_LOC=../final/
 
 all: sr_gui
-sr_gui: sr_gui.cpp register_image.o image_manipulations.o gen_window.o load_images.o sr_one_step.o debug.o subpixel_register.o
+sr_gui: sr_gui.cpp register_image.o image_manipulations.o gen_window.o load_images.o sr_one_step.o debug.o subpixel_register.o $(IM_LOC)register_image.h $(IM_LOC)load_images.h $(IM_LOC)subpixel_register.h
 	g++ -o sr_gui sr_gui.cpp register_image.o image_manipulations.o gen_window.o load_images.o sr_one_step.o debug.o subpixel_register.o $(OPENCV_INCS) $(FFTW_INCS)
 
 sr_one_step.o: $(IM_LOC)sr_one_step.h $(IM_LOC)sr_one_step.cpp

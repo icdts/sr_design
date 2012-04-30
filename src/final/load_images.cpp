@@ -17,9 +17,8 @@ using namespace cv;
 			The directory within which all of the input images are contained.
 
 ******************************************************************************/
-vector<input_image> load_images( string dir ){
+void load_images( string dir, vector<input_image> * files ){
 	debug("Load Images called");
-	vector<input_image> files;
 	Mat tmp;
 	DIR *dp;
 
@@ -30,6 +29,7 @@ vector<input_image> load_images( string dir ){
 	}
 
 	while ((dirp = readdir(dp)) != NULL) {
+		debug(dirp->d_name);
 		if( string(dirp->d_name) != "." && string(dirp->d_name) != ".."){
 			input_image f;
 			f.name = dir + string(dirp->d_name);
@@ -37,13 +37,13 @@ vector<input_image> load_images( string dir ){
 			tmp = imread(f.name.c_str(), CV_LOAD_IMAGE_COLOR);
 			tmp.convertTo(f.file,CV_32F);
 
+			imshow(dirp->d_name,tmp);
+			waitKey(0);
 			f.name = string(dirp->d_name);
 
-			files.push_back(f);
+			files->push_back(f);
 		}
 	}
 
 	closedir(dp);
-
-	return files;
 }
