@@ -9,5 +9,6 @@
 #include <string>
 #include <iostream>
 #include "input_image.h"
+#include "debug.h"
 
 std::vector<input_image> load_images(std::string dir);

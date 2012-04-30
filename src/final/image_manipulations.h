@@ -3,6 +3,7 @@
 	#include <opencv2/core/core.hpp>
 	#include <opencv2/highgui/highgui.hpp>
 #include <iostream>
+#include "debug.h"
 
 cv::Mat shiftMat(cv::Mat, int, int);
 cv::Mat shiftMatRot(cv::Mat, int, int);

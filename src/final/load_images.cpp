@@ -18,6 +18,7 @@ using namespace cv;
 
 ******************************************************************************/
 vector<input_image> load_images( string dir ){
+	debug("Load Images called");
 	vector<input_image> files;
 	Mat tmp;
 	DIR *dp;

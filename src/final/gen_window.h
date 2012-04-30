@@ -5,6 +5,7 @@
 	#include <opencv2/highgui/highgui.hpp>
 #endif
 #include <iostream>
+#include "debug.h"
 
 using namespace cv;
 

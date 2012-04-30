@@ -27,6 +27,7 @@ using namespace cv;
 Mat shiftMat(	Mat input, 
 				int vertical, 
 				int horizontal ){
+	debug("ShiftMat called");
 	Mat src;
 	Mat image_shifted;
 	bool opposite_direction;
@@ -104,6 +105,9 @@ Mat shiftMat(	Mat input,
 Mat shiftMatRot(	Mat input, 
 					int vertical, 
 					int horizontal ){
+
+	debug("shiftMatRot called");
+	
 	Mat src;
 	Mat image_shifted; //(size, src.depth(), src.channels());
 	bool opposite_direction;

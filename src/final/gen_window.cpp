@@ -32,6 +32,7 @@ Mat gen_window( int height,
 				float hpercent, 
 				float wpercent, 
 				int channels ){
+	debug("Gen Window Called");
 	vector<Mat> planes;
 	Mat retVal;
 
