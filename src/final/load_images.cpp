@@ -6,15 +6,19 @@ using namespace cv;
 
 /******************************************************************************
 
-	load_images accepts the string of a directory as a parameter.  It then 
-	loads all of the images of that directory into a Mat element in  an 
-	input_images object. The input_image is also loaded with the name of the 
-	image and is then added to a vector with all of the other images from the
-	directory.  This vector is then returned.
+	load_images accepts the string of a directory and a pointer to a vector of 
+	input_images as parameters.  It then loads all of the images of that 
+	directory into a Mat element in  an input_images object. The input_image is 
+	also loaded with the name of the image and is then added to a vector with 
+	all of the other images from the directory.  This vector is then returned.
 
 	load_images:
 		string dir:
 			The directory within which all of the input images are contained.
+		vector<input_image> * files:
+			A pointer to a vector of input_images. The variable files is passed
+			by reference whenever the function is called, so each time the 
+			funtion executes, the loaded images are stored in the vector.
 
 ******************************************************************************/
 void load_images( string dir, vector<input_image> * files ){

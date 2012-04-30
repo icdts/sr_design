@@ -1,35 +1,16 @@
 #include "register_image.h"
 
-/*
-function [im2_reg,sh,f]=register_image(im1,im2)
-oim2=im2;
-w=gen_window(size(im1),0.05,0.05);
-im1=w.*im1; % mitigate boundary effect
-im2=w.*im2; % by using w as a kernel
-%dot-star is entry-by-entry multiplication
+/******************************************************************************
 
-%matrix right division (mrdivide)
-%must have same number of columns
+    phase_correlation summary here.
 
-%mean(im(:)) returns a single value for mean of all elements
-im1=im1/mean(im1(:)); %pretend normalizing
-im2=im2/mean(im2(:));
+    phase_correlation:
+        Mat m_ref:
 
-%2D FFT on image 1 entry-by-entry multipled with FFT on image 2 rotated 180
-%degrees
-tmp=fft2(im1).*fft2(flipud(fliplr(im2)));
-f=fftshift(abs(ifft2(tmp))); %fftshift moves fft so zero frequency 
-                             %component is in middle, ifft2 inverse fft
-%find max value in the new image (value: dummy, index: shid)
-[dummy,shid]=max(f(:));
+        Mat m_tpl:
+        
 
-%make a point based on the middle of the image
-sh(1)=(mod(shid-1,size(im1,1))+1)-size(im1,1)/2;
-sh(2)=ceil((shid-1)/size(im1,1))-size(im1,2)/2;
-%shift the image based on the (new) midpoint?
-%this is still somewhat unclear
-im2_reg=shift_image(oim2,sh);
-*/
+******************************************************************************/
 
 using namespace std;
 using namespace cv;
@@ -58,14 +39,33 @@ Point phase_correlation( Mat m_ref, Mat m_tpl ){
     double  *poc_data = ( double* )poc->imageData;
     
     /* allocate FFTW input and output arrays */
-    fftw_complex *img1 = ( fftw_complex* )fftw_malloc( sizeof( fftw_complex ) * width * height );
-    fftw_complex *img2 = ( fftw_complex* )fftw_malloc( sizeof( fftw_complex ) * width * height );
-    fftw_complex *res  = ( fftw_complex* )fftw_malloc( sizeof( fftw_complex ) * width * height );   
+    fftw_complex *img1 = ( fftw_complex* )fftw_malloc( 
+            sizeof( fftw_complex ) * width * height );
+    
+    fftw_complex *img2 = ( fftw_complex* )fftw_malloc( 
+            sizeof( fftw_complex ) * width * height );
+    
+    fftw_complex *res  = ( fftw_complex* )fftw_malloc( 
+            sizeof( fftw_complex ) * width * height );   
     
     /* setup FFTW plans */
-    fftw_plan fft_img1 = fftw_plan_dft_1d( width * height, img1, img1, FFTW_FORWARD,  FFTW_ESTIMATE );
-    fftw_plan fft_img2 = fftw_plan_dft_1d( width * height, img2, img2, FFTW_FORWARD,  FFTW_ESTIMATE );
-    fftw_plan ifft_res = fftw_plan_dft_1d( width * height, res,  res,  FFTW_BACKWARD, FFTW_ESTIMATE );
+    fftw_plan fft_img1 = fftw_plan_dft_1d( width * height, 
+                                           img1, 
+                                           img1, 
+                                           FFTW_FORWARD,  
+                                           FFTW_ESTIMATE );
+
+    fftw_plan fft_img2 = fftw_plan_dft_1d( width * height, 
+                                           img2, 
+                                           img2, 
+                                           FFTW_FORWARD,  
+                                           FFTW_ESTIMATE );
+    
+    fftw_plan ifft_res = fftw_plan_dft_1d( width * height, 
+                                           res,  
+                                           res,  
+                                           FFTW_BACKWARD, 
+                                           FFTW_ESTIMATE );
     
     /* load images' data to FFTW input */
     for( i = 0, k = 0 ; i < height ; i++ ) {
@@ -86,8 +86,11 @@ Point phase_correlation( Mat m_ref, Mat m_tpl ){
     
     /* obtain the cross power spectrum */
     for( i = 0; i < fft_size ; i++ ) {
-        res[i][0] = ( img2[i][0] * img1[i][0] ) - ( img2[i][1] * ( -img1[i][1] ) );
-        res[i][1] = ( img2[i][0] * ( -img1[i][1] ) ) + ( img2[i][1] * img1[i][0] );
+        res[i][0] = ( img2[i][0] * img1[i][0] ) - 
+                    ( img2[i][1] * ( -img1[i][1] ) );
+        
+        res[i][1] = ( img2[i][0] * ( -img1[i][1] ) ) + 
+                    ( img2[i][1] * img1[i][0] );
 
         tmp = sqrt( pow( res[i][0], 2.0 ) + pow( res[i][1], 2.0 ) );
 
@@ -120,6 +123,18 @@ Point phase_correlation( Mat m_ref, Mat m_tpl ){
 
     return maxloc;
 }
+
+/******************************************************************************
+    
+    register_image summary here.
+
+    register_image:
+        input_image * input1:
+
+        input_image * input2:
+
+
+******************************************************************************/
 
 void register_image(input_image * input1, input_image * input2){
     debug("Register image called");
