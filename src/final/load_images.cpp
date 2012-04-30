@@ -37,8 +37,6 @@ void load_images( string dir, vector<input_image> * files ){
 			tmp = imread(f.name.c_str(), CV_LOAD_IMAGE_COLOR);
 			tmp.convertTo(f.file,CV_32F);
 
-			imshow(dirp->d_name,tmp);
-			waitKey(0);
 			f.name = string(dirp->d_name);
 
 			files->push_back(f);

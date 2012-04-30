@@ -6,6 +6,7 @@
 #endif
 #include <iostream>
 #include "debug.h"
+#include <vector>
 
 using namespace cv;
 

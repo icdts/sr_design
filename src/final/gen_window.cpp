@@ -1,5 +1,4 @@
 #include "gen_window.h"
-#include <vector>
 
 using namespace std;
 using namespace cv;

@@ -7,4 +7,4 @@
 #include "subpixel_register.h"
 #include "debug.h"
 
-cv::Mat sr_one_step(input_image &src, std::vector <input_image> &input);
+cv::Mat sr_one_step(input_image *src, std::vector <input_image> *input);

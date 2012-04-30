@@ -55,14 +55,11 @@ int main(int argc, char const *argv[]){
 			return -1;
 		}
 	}
-	// #1
-
+	
 	cout<<"Loading Images"<<endl;
 	std::vector<input_image> images;
 	load_images(argv[loadDirectoryIndex],&images);
 
-	// #2
-	
 	cout<<"Registering Images"<<endl;
 	for(int i = 1; i < images.size(); i++){
 		register_image(&images[0], &images[i]);
@@ -107,8 +104,9 @@ int main(int argc, char const *argv[]){
 */
 	cout<<"Starting Super-resolution Algorigthm"<<endl;
 
-	Mat final = sr_one_step(images[0], images);
+	Mat final = sr_one_step(&images[0], &images);
 
+	final.convertTo(final,CV_8U);
 	/*if(color){
 
 	} else{

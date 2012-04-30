@@ -275,14 +275,25 @@ Mat genShiftDownsampleMat(	Mat src,
 							int up_down, 
 							int left_right, 
 							int downsample_ratio ){	
+	debug("genShiftDownSampleMat called");
 
 	Mat gsds_image;
 	int del_width = src.cols % downsample_ratio;
 	int del_height = src.rows % downsample_ratio;
 
-	gsds_image = Mat(src, 
-					 Range(0, src.cols-del_width), 
-					 Range(0, src.rows-del_height) );
+	/*
+	cerr << "src.cols: " << src.cols
+		<< endl << "src.rows" << src.rows
+		<< endl << "src.cols-del_width" << src.cols-del_width
+		<< endl << "src.rows-del_height" << src.rows-del_height
+		<< endl;
+	*/
+	gsds_image = src(
+					Range(0, src.rows-del_height),
+					Range(0, src.cols-del_width)
+	);
+
+	debug("Created new image, not shifting");
 
 	gsds_image = shiftMat( gsds_image, up_down, left_right);
 	

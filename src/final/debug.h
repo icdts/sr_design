@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#define DEBUG
+//#define DEBUG
  
 void debug(std::string);
 void printMatrix(cv::Mat);
