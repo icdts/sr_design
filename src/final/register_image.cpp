@@ -130,8 +130,6 @@ Point phase_correlation( Mat m_ref, Mat m_tpl ){
 
     /* deallocate IplImage variables */
     cvReleaseImage(&poc);
-    cvReleaseImage(ref);
-    cvReleaseImage(tmp);
 
     return maxloc;
 }
