@@ -3,6 +3,7 @@
 #include <vector>
 #include "../final/load_images.h"
 #include "../final/register_image.h"
+#include "../final/sr_one_step.h"
 #include <opencv/cv.h>
 #include <opencv2/core/core.hpp>
 
@@ -103,7 +104,7 @@ int main(int argc, char const *argv[]){
 */
 	cout<<"Starting Super-resolution Algorigthm"<<endl;
 
-	Mat final = sr_one_step_WB(images[0].file, images);
+	Mat final = sr_one_step(images[0].file, images);
 
 	/*if(color){
 
