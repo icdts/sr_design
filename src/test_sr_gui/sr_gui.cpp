@@ -3,6 +3,9 @@
 #include <vector>
 #include "../final/load_images.h"
 #include "../final/register_image.h"
+#include "../final/sr_one_step.h"
+#include <opencv/cv.h>
+#include <opencv2/core/core.hpp>
 
 /*
 	Steps for making the matlab program do what we want it to:
@@ -10,6 +13,9 @@
 	2.	Register Image
 	3.	SR(BW/Color)
 */
+
+using namespace std;
+using namespace cv;
 
 int main(int argc, char const *argv[]){
 	int loadDirectoryIndex = 0; //Index of argv where the load directory is located
@@ -20,15 +26,16 @@ int main(int argc, char const *argv[]){
 
 	//	Handle input
 	
-	if(argv==1||argv>4){
-		cout<<"Invalid arguments.\n\nExecution should be of the format:\n s"+
-		"r_gui ([-c])[LOAD_DIRECTORY]([OUTPUT_DIRECTORY])\n"<<endl;
+	if(argc==1||argc>4){
+		cout<< "Invalid arguments.\n\nExecution should be of the format:\n s"
+			<< "r_gui ([-c])[LOAD_DIRECTORY]([OUTPUT_DIRECTORY])\n"
+			<< endl;
 		return -1;
 	}
 
-	if(argv==2){
+	if(argc==2){
 		loadDirectoryIndex = 1;
-	} else if(argv == 3){
+	} else if(argc == 3){
 		if(argv[1] == "-c"){
 			color = true;
 			loadDirectoryIndex = 2;
@@ -36,14 +43,15 @@ int main(int argc, char const *argv[]){
 			loadDirectoryIndex = 1;
 			saveDirectoryIndex = 2;
 		}
-	} else if(argv == 4){
+	} else if(argc == 4){
 		if(argv[1] == "-c"){
 			color = true;
 			loadDirectoryIndex = 2;
 			saveDirectoryIndex = 3;
 		} else{
-			cout<<"Invalid arguments.\n\nExecution should be of the format:\n s"+
-			"r_gui ([-c])[LOAD_DIRECTORY]([OUTPUT_DIRECTORY])\n"<<endl;
+			cout<< "Invalid arguments.\n\nExecution should be of the format:\n s"
+				<< "r_gui ([-c])[LOAD_DIRECTORY]([OUTPUT_DIRECTORY])\n"
+				<< endl;
 			return -1;
 		}
 	}
@@ -55,14 +63,8 @@ int main(int argc, char const *argv[]){
 	// #2
 	
 	cout<<"Registering Images"<<endl;
-	if(color){
-		/*for(int i = 1; i < 1+(int)images.size; i++){
-			images[i] = register_color_image(images[0], images[1]);
-		}*/
-	}else{
-		for(int i = 1; i < 1+(int)images.size; i++){
-			images[i] = register_image(images[0], images[1]);
-		}
+	for(int i = 1; i < 1+(int)images.size(); i++){
+		register_image(images[0], images[i]);
 	}
 
 
@@ -104,21 +106,25 @@ int main(int argc, char const *argv[]){
 */
 	cout<<"Starting Super-resolution Algorigthm"<<endl;
 
-	if(color){
+	Mat final = sr_one_step(images[0], images);
+
+	/*if(color){
 
 	} else{
 		Mat final = sr_bw(/* Whatever arguments this takes.  I assume 'images' 
-							 will be somehow involved.'*/);
-	}
+							 will be somehow involved.');
+	}*/
 
+	string name = "output.jpg";
 	if(saveDirectoryIndex){
-		imwrite(argv[saveDirectoryIndex]+"output.jpg", final);
+		name = argv[saveDirectoryIndex] + name;
+		imwrite(name, final);
 	} else{
-		imwrite(output.jpg, final);
+		imwrite(name, final);
 	}
 
-	imShow("Result", final);
-	waitkey(0);
+	imshow("Result", final);
+	waitKey(0);
 
 	return 0;
 }
