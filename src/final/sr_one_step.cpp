@@ -11,6 +11,7 @@ It is given a source image (mainly for dimensions?) and the vector of input imag
 Mat sr_one_step(input_image &src, vector <input_image> &input){
 	debug("sr_one_step called");
 	Mat kron_image;
+	resize(src.file, src.file, Size(), 4, 4, CV_INTER_AREA);
 	//calls sub_pixel register to assign shifts and probabilities for each input image
 	for (int tid = 0; tid < input.size(); tid++){
 		cout<<"I made it "<<tid<<"times!"<<endl;
