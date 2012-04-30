@@ -1,4 +1,3 @@
-//sr_gui [-c][LOAD_DIRECTORY][OUTPUT_DIRECTORY]
 #include <iostream>
 #include <vector>
 #include "load_images.h"
@@ -7,113 +6,69 @@
 #include <opencv/cv.h>
 #include <opencv2/core/core.hpp>
 
-/*
-	Steps for making the matlab program do what we want it to:
-	1.	File -> load images
-	2.	Register Image
-	3.	SR(BW/Color)
-*/
-
 using namespace std;
 using namespace cv;
 
+/******************************************************************************
+	
+	sr_gui [LOAD_DIRECTORY] ([OUTPUT_DIRECTORY])
+
+	Steps for making the matlab program do what we want it to:
+	
+	1.	Load images
+	2.	Register images
+	3.	Super Resolution
+	4. 	Convert Mat from float to uchar
+	5. 	Save result
+	6. 	Output result to screen
+
+******************************************************************************/
+
 int main(int argc, char const *argv[]){
-	int loadDirectoryIndex = 0; //Index of argv where the load directory is located
-	int saveDirectoryIndex = 0; //Index of argv where the save directory is located
+	/* Index of argv where the load directory is located */
+	int loadDirectoryIndex = 0; 
+	
+	/* Index of argv where the save directory is located */
+	int saveDirectoryIndex = 0; 
 
-	bool color = false;		//Initialize the color mode to black and white.
+	/* Initialize the color mode to black and white. */
+	bool color = false;	
 	
 
-	//	Handle input
-	
-	if(argc==1||argc>4){
-		cout<< "Invalid arguments.\n\nExecution should be of the format:\n s"
-			<< "r_gui ([-c])[LOAD_DIRECTORY]([OUTPUT_DIRECTORY])\n"
+	/* Handle input */
+	if(argc==1||argc>3){
+		cout<< "Invalid arguments.\n\nExecution should be of the format:\n sr_"
+			<< "gui [LOAD_DIRECTORY] ([OUTPUT_DIRECTORY])\n"
 			<< endl;
 		return -1;
 	}
-
 	if(argc==2){
 		loadDirectoryIndex = 1;
 	} else if(argc == 3){
-		if(argv[1] == "-c"){
-			color = true;
-			loadDirectoryIndex = 2;
-		} else{
-			loadDirectoryIndex = 1;
-			saveDirectoryIndex = 2;
-		}
-	} else if(argc == 4){
-		if(argv[1] == "-c"){
-			color = true;
-			loadDirectoryIndex = 2;
-			saveDirectoryIndex = 3;
-		} else{
-			cout<< "Invalid arguments.\n\nExecution should be of the format:\n s"
-				<< "r_gui ([-c])[LOAD_DIRECTORY]([OUTPUT_DIRECTORY])\n"
-				<< endl;
-			return -1;
-		}
+		loadDirectoryIndex = 1;
+		saveDirectoryIndex = 2;
 	}
-	
+
+
+	/* 1. Load images */
 	cout<<"Loading Images"<<endl;
 	std::vector<input_image> images;
 	load_images(argv[loadDirectoryIndex],&images);
 
+	/* 2. Register images */
 	cout<<"Registering Images"<<endl;
 	for(int i = 1; i < images.size(); i++){
 		register_image(&images[0], &images[i]);
 	}
 
-
-	// #3
-
-	/*% --- Executes on button press in SRBWButton.
-	function SRBWButton_Callback(hObject, eventdata, handles)
-	% hObject    handle to SRBWButton (see GCBO)
-	% eventdata  reserved - to be defined in a future version of MATLAB
-	% handles    structure with handles and user data (see GUIDATA)
-	[p1,p2]=get_clip_range(handles);
-	for id=1:length(handles.images)
-	    t2{id}=handles.images{id}(p1(2):p2(2),p1(1):p2(1),1)*255;
-	end
-	h=waitbar(0,'Running super-resolution for red component...');
-	image=sr_bw(t2,h,0,1)/255;
-	delete(h);
-	figure; imshow(image); title('super resolution image');
-
-	% --- Executes on button press in SRColorButton.
-	function SRColorButton_Callback(hObject, eventdata, handles)
-	% hObject    handle to SRColorButton (see GCBO)
-	% eventdata  reserved - to be defined in a future version of MATLAB
-	% handles    structure with handles and user data (see GUIDATA)
-	[p1,p2]=get_clip_range(handles);
-	h=waitbar(0,'Running super-resolution for all three components...');
-	for color=1:3
-	    for id=1:length(handles.images)
-	        t2{id}=handles.images{id}(p1(2):p2(2),p1(1):p2(1),color)*255;
-	    end
-	    image{color}=sr_bw(t2,h,(color-1)/3,1/3)/255;
-	end
-	delete(h);
-	tmpimg=zeros([size(image{color}) 3]);
-	for color=1:3
-	    tmpimg(:,:,color)=image{color};
-	end
-	figure; imshow(tmpimg); title('super resolution image');
-*/
+	/* 3. Super resolution */
 	cout<<"Starting Super-resolution Algorigthm"<<endl;
-
 	Mat final = sr_one_step(&images[0], &images);
-
+	
+	/* 4. Convert Mat from float to uchar */
 	final.convertTo(final,CV_8U);
-	/*if(color){
 
-	} else{
-		Mat final = sr_bw(/* Whatever arguments this takes.  I assume 'images' 
-							 will be somehow involved.');
-	}*/
-
+	/* 5. Save result */
 	string name = "output.jpg";
 	if(saveDirectoryIndex){
 		name = argv[saveDirectoryIndex] + name;
@@ -122,6 +77,7 @@ int main(int argc, char const *argv[]){
 		imwrite(name, final);
 	}
 
+	/* 6. Output result to screen */
 	imshow("Result", final);
 	waitKey(0);
 
