@@ -3,6 +3,8 @@
 #include <vector>
 #include "../final/load_images.h"
 #include "../final/register_image.h"
+#include <opencv/cv.h>
+#include <opencv2/core/core.hpp>
 
 /*
 	Steps for making the matlab program do what we want it to:
@@ -10,6 +12,9 @@
 	2.	Register Image
 	3.	SR(BW/Color)
 */
+
+using namespace std;
+using namespace cv;
 
 int main(int argc, char const *argv[]){
 	int loadDirectoryIndex = 0; //Index of argv where the load directory is located
@@ -55,14 +60,8 @@ int main(int argc, char const *argv[]){
 	// #2
 	
 	cout<<"Registering Images"<<endl;
-	if(color){
-		/*for(int i = 1; i < 1+(int)images.size; i++){
-			images[i] = register_color_image(images[0], images[1]);
-		}*/
-	}else{
-		for(int i = 1; i < 1+(int)images.size; i++){
-			images[i] = register_image(images[0], images[1]);
-		}
+	for(int i = 1; i < 1+(int)images.size; i++){
+		register_image(images[0], images[i]);
 	}
 
 
@@ -104,12 +103,14 @@ int main(int argc, char const *argv[]){
 */
 	cout<<"Starting Super-resolution Algorigthm"<<endl;
 
-	if(color){
+	Mat final = sr_one_step_WB(images[0].file, images);
+
+	/*if(color){
 
 	} else{
 		Mat final = sr_bw(/* Whatever arguments this takes.  I assume 'images' 
-							 will be somehow involved.'*/);
-	}
+							 will be somehow involved.');
+	}*/
 
 	if(saveDirectoryIndex){
 		imwrite(argv[saveDirectoryIndex]+"output.jpg", final);
