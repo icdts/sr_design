@@ -40,10 +40,11 @@ void adjustments(Mat& im1, Mat& im2){
     Mat im2_mean;
 
     debug("Mitigating Boundary Effect");
-    window = gen_window(im1.rows,im1.cols,0.05,0.05,im1.channels());
+    window = gen_window(im1.cols,im1.rows,0.05,0.05,im1.channels());
 
     debug("Got window back");
     im1 = window.mul(im1);
+    debug("window2");
     im2 = window.mul(im2);
 
     debug("Fake Normalizing");
@@ -100,11 +101,31 @@ Mat fftMath(Mat &input1, Mat &input2, bool t){
 
     debug("FFT calls");
     dft(im1,im1,DFT_COMPLEX_OUTPUT);
+    transpose(im1,im1);
+    dft(im1,im1,DFT_COMPLEX_OUTPUT);
+    transpose(im1,im1);
+
+    printMatrix(im1);
+    dft(im2,im2,DFT_COMPLEX_OUTPUT);
+    transpose(im2,im2);
+    dft(im2,im2,DFT_COMPLEX_OUTPUT);
+    transpose(im2,im2);
+
+    /*
+    transpose(im1,im1);
+    transpose(im2,im2);
+
+    dft(im1,im1,DFT_COMPLEX_OUTPUT);
     dft(im2,im2,DFT_COMPLEX_OUTPUT);
 
+    transpose(im1,im1);
+    transpose(im2,im2);
+    */
     debug("Multipy on element-by-element basis");
     im1 = im1.mul(im2);
 
+    debug("After fft2(weafw) .* fft2(fiawo) or something");
+    printMatrix(im1);
     /*
         %fftShift moves fft so zero frequency 
         %component is in middle, ifft2 inverse fft    debug("Reverse FFT");
@@ -112,6 +133,9 @@ Mat fftMath(Mat &input1, Mat &input2, bool t){
     */
     debug("Reverse fft");
     idft(im1,im1,DFT_REAL_OUTPUT);
+    transpose(im1,im1);
+    idft(im1,im1,DFT_REAL_OUTPUT);
+    transpose(im1,im1);
 
     debug("Abs of result");    
     im1 = abs(im1);
@@ -146,8 +170,10 @@ Mat register_image(Mat input1, Mat input2){
     fft_return = Mat::zeros(im1.rows,im1.cols,CV_32FC1);
 
     for(int i = 0; i < channels_im1.size(); i++){
-        adjustments(channels_im1[i],channels_im2[i]);
-
+        //adjustments(channels_im1[i],channels_im2[i]);
+        debug("=== Channel");
+        printMatrix(channels_im1[i]);
+        printMatrix(channels_im2[i]);
         fft_return = fft_return + fftMath(channels_im1[i],channels_im2[i],true);
     }
 

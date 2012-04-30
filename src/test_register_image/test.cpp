@@ -4,6 +4,15 @@
 using namespace std;
 using namespace cv;
 
+Mat rotate90(Mat input){
+	Mat im;
+
+	input.copyTo(im);
+	im = im.t();
+	flip(im,im,1);
+	return im;
+}
+
 int main(int argc, char const *argv[]){
 	debug("Reading Images");
 	Mat im1;
@@ -14,17 +23,25 @@ int main(int argc, char const *argv[]){
 	Mat cresult;
 
 	int shifts[4][2] = {
-			{15,0},
-			{-15,0},
-			{0,15},
-			{0,-15}
-	};
+			{0,0}};
+			/*,
+			{-5,0},
+			{0,5},
+			{0,-5}
+	};*/
 
-	for(int i = 0; i < 4; i++){
+	for(int i = 0; i < 1; i++){
 		im1 = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
 		im2 = imread(argv[2], CV_LOAD_IMAGE_GRAYSCALE);
 		cim1 = imread(argv[1]);
 		cim2 = imread(argv[2]);
+
+		/*	
+		im1 = rotate90(im1);
+		im2 = rotate90(im2);
+		cim1 = rotate90(cim1);
+		cim2 = rotate90(cim2);
+		*/
 
 		im1.convertTo(im1,CV_32FC1);
 		im2.convertTo(im2,CV_32FC1);
@@ -44,7 +61,7 @@ int main(int argc, char const *argv[]){
 		cresult = register_image(cim1,cim2);
 		debug("");
 		debug("");
-		
+
 		im1.convertTo(im1,CV_8U);
 		im2.convertTo(im2,CV_8U);
 		cim1.convertTo(cim1,CV_8U);
