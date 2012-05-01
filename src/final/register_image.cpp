@@ -1,5 +1,8 @@
 #include "register_image.h"
 
+using namespace std;
+using namespace cv;
+
 /******************************************************************************
 
     phase_correlation accepts two Mat variables as parameters.  This program
@@ -14,13 +17,12 @@
             which the first image is compared.
 
     Full disclosure:
+        We obtained this code from nashruddin.com after many failed attempts to
+        write this with OpenCV's built-in and DFT function.
 
+        http://nashruddin.com/phase-correlation-function-in-opencv.html
 
 ******************************************************************************/
-
-using namespace std;
-using namespace cv;
-
 Point phase_correlation( Mat m_ref, Mat m_tpl ){
     debug("Phase correlation called");
     IplImage * poc;
@@ -136,16 +138,19 @@ Point phase_correlation( Mat m_ref, Mat m_tpl ){
 
 /******************************************************************************
     
-    register_image summary here.
+    register_image accepts two input_image variables as parameters.  It then
+    uses calls to phase_correlation to determine how the second image should be
+    shifted in order for the two images to "line up".  It then performs the
+    recommended shift.
 
     register_image:
         input_image * input1:
-
+            The base image to which input2 is compared and shifted.
         input_image * input2:
-
+            The image that is shifted according to its correlation with the
+            first image.
 
 ******************************************************************************/
-
 void register_image(input_image * input1, input_image * input2){
     debug("Register image called");
     debug(input1->name);
