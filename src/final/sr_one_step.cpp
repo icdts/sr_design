@@ -41,20 +41,20 @@ Mat sr_one_step(input_image *src, vector <input_image> *input){
         resize((*input)[tid].file, kron_image, Size(), 4, 4, CV_INTER_AREA);
         //if the probability for the input image is high, add the shift to 
         //the output
-        int counter = 0;
+        //int counter = 0;
         if ((*input)[tid].prob > 0.0){
             //shift the enlarged input image by its values determined from 
             //subpixel_register
             sh_image=shiftMat(kron_image, -(*input)[tid].vertical_shift, 
             -(*input)[tid].horizontal_shift);
             debug("After shiftMat in sr_one_step");
-            image = (sh_image + image);
-            counter ++;
+            image = (sh_image + image)/2;
+           // counter ++;
         }
         //if counter is greater than 0, divide the image matrix by counter 
         //to get the average of all added images
-        if(counter > 0)
-            image = image / counter;
+        /*if(counter > 0)
+            image = image / counter;*/
     }
     //shrink image by a scale of 1/4
     resize(image, image, Size(0,0), 0.25, 0.25, CV_INTER_AREA);
