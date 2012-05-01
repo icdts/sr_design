@@ -32,8 +32,8 @@ Mat shiftMat(	Mat input,
 	Mat image_shifted;
 	bool opposite_direction;
 
-	input.copyTo(src);  // Do deep copy, apparently this doesn't happen when
-						// passing
+	/* Do deep copy, apparently this doesn't happen when passing */
+	input.copyTo(src);  
 	src.copyTo(image_shifted);
 
 	opposite_direction = (vertical < 0);
@@ -56,7 +56,7 @@ Mat shiftMat(	Mat input,
 		}
 	}
 
-	//Save changes in prep for second direction
+	/* Save changes in prep for second direction */
 	image_shifted.copyTo(src);
 
 	opposite_direction = (horizontal < 0);
@@ -109,18 +109,13 @@ Mat shiftMatRot(	Mat input,
 	debug("shiftMatRot called");
 	
 	Mat src;
-	Mat image_shifted; //(size, src.depth(), src.channels());
+
+	Mat image_shifted;
 	bool opposite_direction;
 
-	input.copyTo(src); 	// Do deep copy, apparently this doesn't happen when
-						// passing
+	/* Do deep copy, apparently this doesn't happen when passing*/
+	input.copyTo(src); 	
 	src.copyTo(image_shifted);
-
-	/*	
-	image_shifted = cvCreateImage;
-	src = cvCreateImage(size, src.depth, src.nChannels);
-	cvCopy(src,src);
-	*/
 
 	if(vertical != 0 ){
 		opposite_direction = (vertical < 0);
@@ -128,7 +123,7 @@ Mat shiftMatRot(	Mat input,
 			vertical *= -1;
 		}
 
-		//Copy 1st portion
+		/* Copy 1st portion */
 		if(opposite_direction){
 			copyRegion(
 				src,image_shifted,
@@ -143,7 +138,7 @@ Mat shiftMatRot(	Mat input,
 			);
 		}
 
-		//Copy 2nd portion
+		/* Copy 2nd portion */
 		if(opposite_direction){
 			copyRegion(
 				src,image_shifted,
@@ -167,7 +162,7 @@ Mat shiftMatRot(	Mat input,
 			horizontal *= -1;
 		}
 		
-		//Copy 1st portion
+		/* Copy 1st portion */
 		if(opposite_direction){
 			copyRegion(
 				src,image_shifted,
@@ -182,7 +177,7 @@ Mat shiftMatRot(	Mat input,
 			);
 		}
 
-		//Copy 2nd portion
+		/* Copy 2nd portion */
 		if(opposite_direction){
 			copyRegion(
 				src,image_shifted,
@@ -281,13 +276,6 @@ Mat genShiftDownsampleMat(	Mat src,
 	int del_width = src.cols % downsample_ratio;
 	int del_height = src.rows % downsample_ratio;
 
-	/*
-	cerr << "src.cols: " << src.cols
-		<< endl << "src.rows" << src.rows
-		<< endl << "src.cols-del_width" << src.cols-del_width
-		<< endl << "src.rows-del_height" << src.rows-del_height
-		<< endl;
-	*/
 	gsds_image = src(
 					Range(0, src.rows-del_height),
 					Range(0, src.cols-del_width)

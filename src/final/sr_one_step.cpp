@@ -57,6 +57,6 @@ Mat sr_one_step(input_image *src, vector <input_image> *input){
 			image = image / counter;
 	}
 	//shrink image by a scale of 1/4
-	resize(image, image, .25, .25, CV_INTER_AREA);
+	resize(image, image, Size(0,0), 0.25, 0.25, CV_INTER_AREA);
 	return image;
 }

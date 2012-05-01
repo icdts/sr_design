@@ -1,23 +1,33 @@
 #include "register_image.h"
 
-/******************************************************************************
-
-    phase_correlation summary here.
-
-    phase_correlation:
-        Mat m_ref:
-
-        Mat m_tpl:
-        
-
-******************************************************************************/
-
 using namespace std;
 using namespace cv;
 
+/******************************************************************************
+
+    phase_correlation accepts two Mat variables as parameters.  This program
+    takes two images of equal size and uses the FFTW library to assess the two
+    images' similarity to one another.
+
+    phase_correlation:
+        Mat m_ref:
+            Reference image.  This is the first image passed to the function.
+        Mat m_tpl:
+            Template image.  This is the second image passed to the function, to
+            which the first image is compared.
+
+    Full disclosure:
+        We obtained this code from nashruddin.com after many failed attempts to
+        write this with OpenCV's built-in and DFT function.
+
+        http://nashruddin.com/phase-correlation-function-in-opencv.html
+
+******************************************************************************/
 Point phase_correlation( Mat m_ref, Mat m_tpl ){
     debug("Phase correlation called");
     IplImage * poc;
+    
+    /*  */
     IplImage ref = m_ref;
     IplImage tpl = m_tpl;
 
@@ -106,7 +116,7 @@ Point phase_correlation( Mat m_ref, Mat m_tpl ){
         poc_data[i] = res[i][0] / ( double )fft_size;
     }
 
-        /* find the maximum value and its location */
+    /* find the maximum value and its location */
     CvPoint minloc, maxloc;
     double  minval, maxval;
     cvMinMaxLoc( poc, &minval, &maxval, &minloc, &maxloc, 0 );
@@ -119,6 +129,8 @@ Point phase_correlation( Mat m_ref, Mat m_tpl ){
     fftw_free( img2 );
     fftw_free( res );   
 
+
+    /* deallocate IplImage variables */
     cvReleaseImage(&poc);
 
     return maxloc;
@@ -126,16 +138,19 @@ Point phase_correlation( Mat m_ref, Mat m_tpl ){
 
 /******************************************************************************
     
-    register_image summary here.
+    register_image accepts two input_image variables as parameters.  It then
+    uses calls to phase_correlation to determine how the second image should be
+    shifted in order for the two images to "line up".  It then performs the
+    recommended shift.
 
     register_image:
         input_image * input1:
-
+            The base image to which input2 is compared and shifted.
         input_image * input2:
-
+            The image that is shifted according to its correlation with the
+            first image.
 
 ******************************************************************************/
-
 void register_image(input_image * input1, input_image * input2){
     debug("Register image called");
     debug(input1->name);
@@ -174,5 +189,5 @@ void register_image(input_image * input1, input_image * input2){
     input2->vertical_shift = shift.y;
 
     input2->file.convertTo(im1,CV_8U);
-    imwrite("registered" + input2->name + ".jpg",im1);
+    //imwrite("registered" + input2->name + ".jpg",im1);
 }
