@@ -12,7 +12,7 @@
 /* For debugging purposes */
 #include "debug.h"
 
-/* This class uses input_images */
+/* This code uses input_images */
 #include "input_image.h" 
 
 

@@ -1,11 +1,15 @@
-#ifdef _MSC_VER
-#else
-	#include <opencv/cv.h>
-	#include <opencv2/core/core.hpp>
-	#include <opencv2/highgui/highgui.hpp>
-#endif
+/* For OpenCV datatypes and functions */
+#include <opencv/cv.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+/* For Console I/O */
 #include <iostream>
+
+/* For debugging purposes */
 #include "debug.h"
+
+/* For creating vectors of various data types */
 #include <vector>
 
 using namespace cv;
