@@ -12,8 +12,8 @@
 /* For debugging purposes */
 #include "debug.h"
 
-/* This code uses input_images */
-#include "input_image.h" 
+/* This code uses image_datas */
+#include "image_data.h" 
 
 
-float subpixel_register(input_image *hr_image, input_image *lr_image, int ds, int sigma); 
+float subpixel_register(image_data *hr_image, image_data *lr_image, int ds, int sigma); 

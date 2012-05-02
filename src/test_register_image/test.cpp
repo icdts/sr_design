@@ -19,10 +19,10 @@ int main(int argc, char const *argv[]){
 	Mat im2;
 	Mat cim1;
 	Mat cim2;
-	input_image input_im1;
-	input_image input_im2;
-	input_image input_cim1;
-	input_image input_cim2;
+	image_data input_im1;
+	image_data input_im2;
+	image_data input_cim1;
+	image_data input_cim2;
 
 	im1 = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);
 	im2 = imread(argv[2], CV_LOAD_IMAGE_GRAYSCALE);

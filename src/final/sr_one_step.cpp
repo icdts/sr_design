@@ -5,17 +5,17 @@ using namespace cv;
 
 /******************************************************************************
 
-    sr_one_step() takess an input_image and an input_image vector, representing 
+    sr_one_step() takess an image_data and an image_data vector, representing 
     the low-resolution images. It calls subpixel_register() to calculate shifts 
     and probabilities for each file, and uses these shifts with shiftMat() to 
     combine the low-resolution images into one high-resolution output image.
     Output: Mat with 4x the number of rows and columns as the low-res input.
 
     sr_one_step():
-        input_image* src:
+        image_data* src:
             The low-res image struct used as a reference for the shifts in 
             subpixel_register()
-        vector <input_image> *input:
+        vector <image_data> *input:
             The vector of low-res input images; used in subpixel_register() to 
             determine shifts, and then each image with a positive probability 
             is shifted with shiftMat() and combined together to form the high-
@@ -23,7 +23,7 @@ using namespace cv;
     
 
 ******************************************************************************/
-Mat sr_one_step(input_image *src, vector <input_image> *input){
+Mat sr_one_step(image_data *src, vector <image_data> *input){
     debug("sr_one_step called");
     Mat kron_image;
     resize(src->file, src->file, Size(), 4, 4, CV_INTER_AREA);

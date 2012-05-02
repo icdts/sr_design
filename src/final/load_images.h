@@ -16,10 +16,10 @@
 /* For Console I/O */
 #include <iostream>
 
-/* This class uses input_images */
-#include "input_image.h"
+/* This class uses image_datas */
+#include "image_data.h"
 
 /* For debugging purposes */
 #include "debug.h"
 
-void load_images(std::string dir,std::vector<input_image> *);
+void load_images(std::string dir,std::vector<image_data> *);

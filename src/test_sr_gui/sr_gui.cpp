@@ -57,7 +57,7 @@ int main(int argc, char const *argv[]){
 	}
 	
 	cout<<"Loading Images"<<endl;
-	std::vector<input_image> images;
+	std::vector<image_data> images;
 	load_images(argv[loadDirectoryIndex],&images);
 
 	cout<<"Registering Images"<<endl;

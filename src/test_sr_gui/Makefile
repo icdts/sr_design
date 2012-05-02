@@ -12,10 +12,10 @@ sr_one_step.o: $(IM_LOC)sr_one_step.h $(IM_LOC)sr_one_step.cpp
 subpixel_register.o: $(IM_LOC)subpixel_register.h $(IM_LOC)subpixel_register.cpp $(IM_LOC)image_manipulations.h $(IM_LOC)subpixel_register.h $(IM_LOC)debug.h
 	g++ -c $(IM_LOC)subpixel_register.cpp $(OPENCV_INCS)
 
-load_images.o: $(IM_LOC)load_images.h $(IM_LOC)load_images.cpp $(IM_LOC)input_image.h $(IM_LOC)debug.h
+load_images.o: $(IM_LOC)load_images.h $(IM_LOC)load_images.cpp $(IM_LOC)image_data.h $(IM_LOC)debug.h
 	g++ -c $(IM_LOC)load_images.cpp $(OPENCV_INCS)
 
-register_image.o: $(IM_LOC)register_image.cpp $(IM_LOC)register_image.h $(IM_LOC)image_manipulations.h $(IM_LOC)input_image.h $(IM_LOC)debug.h
+register_image.o: $(IM_LOC)register_image.cpp $(IM_LOC)register_image.h $(IM_LOC)image_manipulations.h $(IM_LOC)image_data.h $(IM_LOC)debug.h
 	g++ -c $(IM_LOC)register_image.cpp $(OPENCV_INCS) $(FFTW_INCS)
 
 gen_window.o: $(IM_LOC)gen_window.cpp $(IM_LOC)gen_window.h $(IM_LOC)debug.h

@@ -18,4 +18,4 @@
 /* For debug purposes */
 #include "debug.h"
 
-cv::Mat sr_one_step(input_image *src, std::vector <input_image> *input);
+cv::Mat sr_one_step(image_data *src, std::vector <image_data> *input);

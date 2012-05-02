@@ -9,7 +9,7 @@ It is given a source image (mainly for dimensions?) and the vector of input imag
 
 /* This function calls the subpixel_register function and creates the final super-resolution output. 
 It is given a source image (mainly for dimensions?) and the vector of input images, and returns a Mat.*/
-Mat sr_one_step(input_image &src, vector <input_image> &input){
+Mat sr_one_step(image_data &src, vector <image_data> &input){
 	Mat kron_image;
 	//calls sub_pixel register to assign shifts and probabilities for each input image
 	for (int tid = 0; tid < input.size(); tid++){

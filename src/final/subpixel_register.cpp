@@ -8,7 +8,7 @@ using namespace cv;
 
 /*******************************************************************************
 
-    subpixel_register accepts two input_images, a downsample int and an int 
+    subpixel_register accepts two image_datas, a downsample int and an int 
     sigma value.  When values are passed in hr_image should be the original 
     image kronned with ds 1 (i.e.: should be the image with each pixel expanded 
     to fill (ds) times the space).  lr_image is the original image being worked on.
@@ -16,10 +16,10 @@ using namespace cv;
     original.
 
     subpixel_register:
-        input_image *hr_input:
+        image_data *hr_input:
             A pointer to an image that has been scaled to (ds)x the size of 
             lr_image
-        input_image *lr_input:
+        image_data *lr_input:
             A pointer to the original image that hr_input is being compared to.
         int ds:
             The factor by which the pixels are scaled.
@@ -27,8 +27,8 @@ using namespace cv;
             Some arbitrary value.  I think it's 40.
 
 *******************************************************************************/
-float subpixel_register( input_image *hr_input, 
-                         input_image *lr_input, 
+float subpixel_register( image_data *hr_input, 
+                         image_data *lr_input, 
                          int ds, 
                          int sigma ){
     debug("SubpixelRegister called");
@@ -100,7 +100,7 @@ float subpixel_register( input_image *hr_input,
             sid += 1;
 
             /* if the new score is better put a new best in the passed image
-            since it was passed by reference this changes the input_image struct
+            since it was passed by reference this changes the image_data struct
             in the above function as well */
             if (final_score > lr_input->score){
                 lr_input->score = final_score;

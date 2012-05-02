@@ -19,9 +19,9 @@
    We use this for FFTs as opposed to OpenCVs DFT function */
 #include "fftw3.h"
 
-/* This code uses input_images */
-#include "input_image.h"
+/* This code uses image_datas */
+#include "image_data.h"
 
 #include <sstream>
 
-void register_image(input_image *, input_image *);
+void register_image(image_data *, image_data *);

@@ -11,10 +11,10 @@ sr_one_step.o: sr_one_step.h sr_one_step.cpp
 subpixel_register.o: subpixel_register.h subpixel_register.cpp image_manipulations.h subpixel_register.h debug.h
 	g++ -c subpixel_register.cpp $(OPENCV_INCS)
 
-load_images.o: load_images.h load_images.cpp input_image.h debug.h
+load_images.o: load_images.h load_images.cpp image_data.h debug.h
 	g++ -c load_images.cpp $(OPENCV_INCS)
 
-register_image.o: register_image.cpp register_image.h image_manipulations.h input_image.h debug.h
+register_image.o: register_image.cpp register_image.h image_manipulations.h image_data.h debug.h
 	g++ -c register_image.cpp $(OPENCV_INCS) $(FFTW_INCS)
 
 gen_window.o: gen_window.cpp gen_window.h debug.h

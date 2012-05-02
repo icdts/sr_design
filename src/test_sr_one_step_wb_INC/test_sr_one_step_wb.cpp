@@ -10,7 +10,7 @@
 using namespace std;
 using namespace cv;
 
-float subpixelregister(input_image *hr_image, input_image *lr_image, int ds, int sigma){
+float subpixelregister(image_data *hr_image, image_data *lr_image, int ds, int sigma){
 	hr_image->horizontal_shift = 1;
 	hr_image->vertical_shift = 2;
 	return 0.95;
@@ -18,7 +18,7 @@ float subpixelregister(input_image *hr_image, input_image *lr_image, int ds, int
 
 /* This function calls the subpixel_register function and creates the final super-resolution output. 
 It is given a source image (mainly for dimensions?) and the vector of input images, and returns a Mat.*/
-Mat sr_one_step_wb(input_image &src, vector <input_image> &input);
+Mat sr_one_step_wb(image_data &src, vector <image_data> &input);
 
 int main(int argc, char* argv[]){
 	/*if ( argc < 2) {
@@ -26,12 +26,12 @@ int main(int argc, char* argv[]){
     return -1;
     }*/
 int rescale_factor = 4;
-input_image image;
-input_image curr;
+image_data image;
+image_data curr;
 curr.prob = 0;
 curr.horizontal_shift = 0;
 curr.vertical_shift = 0;
-vector <input_image> input;
+vector <image_data> input;
 curr.file = imread("taylor.jpg");
 resize(curr.file, curr.file, Size(), 4, 4, CV_INTER_AREA);
 curr.file = shiftMat(curr.file, -3, 4);
@@ -83,7 +83,7 @@ waitKey(0);
 
 /* This function calls the subpixel_register function and creates the final super-resolution output. 
 It is given a source image (mainly for dimensions?) and the vector of input images, and returns a Mat.*/
-Mat sr_one_step_wb(input_image &src, vector <input_image> &input){
+Mat sr_one_step_wb(image_data &src, vector <image_data> &input){
 	Mat kron_image;
 	//calls sub_pixel register to assign shifts and probabilities for each input image
 	for (int tid = 0; tid < input.size(); tid++){

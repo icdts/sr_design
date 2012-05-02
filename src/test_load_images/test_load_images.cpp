@@ -7,7 +7,7 @@ int main(int argc, char *argv[]){
     }
 
 	std::string dir = std::string(argv[1]);
-	std::vector<input_image> files = load_images(std::string(argv[1]));
+	std::vector<image_data> files = load_images(std::string(argv[1]));
 
 	std::cout << "Returned from load_images" << std::endl;
 

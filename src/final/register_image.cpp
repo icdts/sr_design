@@ -138,27 +138,27 @@ Point phase_correlation( Mat m_ref, Mat m_tpl ){
 
 /******************************************************************************
     
-    register_image accepts two input_image variables as parameters.  It then
+    register_image accepts two image_data variables as parameters.  It then
     uses calls to phase_correlation to determine how the second image should be
     shifted in order for the two images to "line up".  It then performs the
     recommended shift.
 
     register_image:
-        input_image * input1:
+        image_data * input1:
             The base image to which input2 is compared and shifted.
-        input_image * input2:
+        image_data * input2:
             The image that is shifted according to its correlation with the
             first image.
 
 ******************************************************************************/
-void register_image(input_image * input1, input_image * input2){
+void register_image(image_data * input1, image_data * input2){
     debug("Register image called");
     debug(input1->name);
     debug(input2->name);
     Mat im1;
     Mat im2;
     Point shift;
-    input_image ret;
+    image_data ret;
     stringstream ss;
     string d_out;
 
