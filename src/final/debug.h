@@ -12,7 +12,7 @@
 /* For creating vectors of various data types */
 #include <vector>
 
-//#define DEBUG
+#define DEBUG
  
 void debug(std::string);
 void printMatrix(cv::Mat);

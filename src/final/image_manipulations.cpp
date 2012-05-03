@@ -281,8 +281,6 @@ Mat genShiftDownsampleMat(  Mat src,
                     Range(0, src.cols-del_width)
     );
 
-    debug("Created new image, not shifting");
-
     gsds_image = shiftMat( gsds_image, up_down, left_right);
     
     resize( gsds_image, 

@@ -26,19 +26,29 @@ using namespace cv;
 Mat sr_one_step(image_data *src, vector <image_data> *input){
     debug("sr_one_step called");
     Mat kron_image;
-    resize(src->file, src->file, Size(), 4, 4, CV_INTER_AREA);
+    int ds = 2;
+
+    Mat sh_image;
+    src->file.copyTo(sh_image);
+    resize(sh_image, sh_image, Size(), ds, ds, CV_INTER_AREA);
+
+    image_data pass_me;
+    sh_image.copyTo(pass_me.file); 
+    
     //calls subpixel_register to assign shifts and probabilities for each 
     //input image
     for (int tid = 1; tid < input->size(); tid++){
-        (*input)[tid].prob = subpixel_register(src, &((*input)[tid]), 4, -1);
+        (*input)[tid].prob = subpixel_register(&pass_me, &((*input)[tid]), ds, -1);
     }
-    Mat image = (*input)[0].file;
-    Mat sh_image(src->file.rows, src->file.cols, CV_32FC1, Scalar(0));
-    resize(image, image, Size(), 4, 4, CV_INTER_AREA);
-    for (int tid = 0; tid < input->size(); tid++){
+    Mat image;
+    (*input)[0].file.copyTo(image);
+    resize(image, image, Size(), ds, ds, CV_INTER_AREA);
+    for (int tid = 1; tid < input->size(); tid++){
         //Resize image by a scale of 4, which was done with a kron product in 
         //matlab
-        resize((*input)[tid].file, kron_image, Size(), 4, 4, CV_INTER_AREA);
+        cout << tid << ": " <<(*input)[tid].file.rows << ", " << (*input)[tid].file.cols <<endl;
+        resize((*input)[tid].file, kron_image, Size(), ds, ds, CV_INTER_AREA); 
+        cout << "kron: " << kron_image.rows << ", " << kron_image.cols <<endl;
         //if the probability for the input image is high, add the shift to 
         //the output
         //int counter = 0;
@@ -48,6 +58,8 @@ Mat sr_one_step(image_data *src, vector <image_data> *input){
             sh_image=shiftMat(kron_image, -(*input)[tid].vertical_shift, 
             -(*input)[tid].horizontal_shift);
             debug("After shiftMat in sr_one_step");
+            cout << sh_image.cols << " = " << image.cols << endl;
+            cout << sh_image.rows << " = " << image.rows << endl;
             image = (sh_image + image)/2;
            // counter ++;
         }
@@ -57,6 +69,6 @@ Mat sr_one_step(image_data *src, vector <image_data> *input){
             image = image / counter;*/
     }
     //shrink image by a scale of 1/4
-    resize(image, image, Size(0,0), 0.25, 0.25, CV_INTER_AREA);
+    resize(image, image, Size(0,0), 1.f/float(ds), 1.f/float(ds), CV_INTER_AREA); 
     return image;
 }

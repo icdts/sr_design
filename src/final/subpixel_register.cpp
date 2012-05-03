@@ -69,7 +69,7 @@ float subpixel_register( image_data *hr_input,
     implementation, the score is usually a number in the thousands */
     for(int i = -8; i<9; i++){
         for(int j = -8; j<9; j++){
-            if ( ( hr_image.width()) / 4  !=   lr_image.width() ){
+            if ( ( hr_image.width()) / ds  !=   lr_image.width() ){
                 cout <<" Troubles: the two images are not the right size)\n";
                 cout <<"hr: "<< hr_image.width()<<" lr: "<< lr_image.width()
                      <<endl;
@@ -77,21 +77,16 @@ float subpixel_register( image_data *hr_input,
             }
             
             Mat t = genShiftDownsampleMat( hr_image, i, j, ds );
-        debug("Converting to floats");
 
             /* Convert to a 64F matrix and store in t_mat */
             t.convertTo(t_mat, CV_64F);
-
-        debug("Math start");
             t_mat = t_mat - lr_image;                 
             pow(t_mat, 2, t_mat);
             /* sigma2 = 2*sigma*sigma */                     
             t_mat = -( t_mat / sigma2 ); 
-        debug("Exponentiating");
             exp( t_mat, t_mat);
             reduce(t_mat, reduced, 0, CV_REDUCE_AVG);
             reduced = reduced * lr_image.height();
-        debug("Getting score");
             final_score = mean(reduced)[0];
             final_score = final_score * lr_image.width();
 
@@ -113,7 +108,6 @@ float subpixel_register( image_data *hr_input,
         }
     }
 
-    debug("determine probability by dividing best score by sum of scores");
     
     /* Determine probability by dividing best score by sum of scores */
     for (int i=0; i<289; i++){
