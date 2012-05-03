@@ -1,9 +1,9 @@
 OPENCV_INCS=`pkg-config --cflags --libs opencv`
 FFTW_INCS=`pkg-config --cflags --libs fftw3`
 
-all: sr_gui
-sr_gui: sr_gui.cpp register_image.o image_manipulations.o gen_window.o load_images.o sr_one_step.o debug.o subpixel_register.o register_image.h load_images.h subpixel_register.h
-	g++ -o sr_gui sr_gui.cpp register_image.o image_manipulations.o gen_window.o load_images.o sr_one_step.o debug.o subpixel_register.o $(OPENCV_INCS) $(FFTW_INCS)
+all: super_resolve
+super_resolve: super_resolve.cpp register_image.o image_manipulations.o gen_window.o load_images.o sr_one_step.o debug.o subpixel_register.o register_image.h load_images.h subpixel_register.h
+	g++ -o super_resolve super_resolve.cpp register_image.o image_manipulations.o gen_window.o load_images.o sr_one_step.o debug.o subpixel_register.o $(OPENCV_INCS) $(FFTW_INCS)
 
 sr_one_step.o: sr_one_step.h sr_one_step.cpp
 	g++ -c sr_one_step.cpp $(OPENCV_INCS)
@@ -27,4 +27,4 @@ debug.o: debug.cpp debug.h
 	g++ -c debug.cpp $(OPENCV_INCS)
 
 clean:
-	rm -f *.o sr_gui
+	rm -f *.o super_resolve
