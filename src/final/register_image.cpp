@@ -189,6 +189,5 @@ void register_image(image_data * input1, image_data * input2){
     input2->vertical_shift = shift.y;
 
     input2->file.convertTo(im1,CV_8U);
-    imshow("place", im1);
-    waitKey(0);
+    imwrite("Registered_" + input2->name, im1);
 }
