@@ -90,7 +90,7 @@ Mat shiftMat(   Mat input,
     It then returns the image as a Mat.
 
 
-    shiftMat:
+    shiftMatRot:
         Mat input:
             The matrix to be shifted.
         int vertical:
@@ -248,7 +248,7 @@ void copyRegion(    Mat &src,
 
 /******************************************************************************
 
-    genShiftDownsampleMat shfts the src matrix as directed by up_down and 
+    genShiftDownsampleMat shifts the src matrix as directed by up_down and 
     left_right and then shrinks the image by a ratio of 1/downsample_ratio. It
     then returns the resulting Mat.
 

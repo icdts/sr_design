@@ -11,8 +11,8 @@ using namespace cv;
     subpixel_register accepts two image_datas, a downsample int and an int 
     sigma value.  When values are passed in hr_image should be the original 
     image kronned with ds 1 (i.e.: should be the image with each pixel expanded 
-    to fill (ds) times the space).  lr_image is the original image being worked on.
-    This way the 'gen_shift_downsample'd image has the same size as the 
+    to fill (ds) times the space).  lr_image is the original image being worked 
+    on. This way the 'gen_shift_downsample'd image has the same size as the 
     original.
 
     subpixel_register:
